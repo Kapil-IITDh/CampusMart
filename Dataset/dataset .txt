@@ -1,0 +1,93 @@
+data = {
+    "Category": [],
+    "Product Name": [],
+    "Price (₹)": [],
+    "Description": [],
+    "Image Link": [],
+    "Rating": [],
+    "Condition": [],
+    "Purchase Rate (₹)": [],
+    "Selling Rate (₹)": [],
+    "Used For (Months)": []
+}
+
+categories = [
+    "Electronics", "Books", "Clothing", "Sports", 
+    "Furniture", "Stationery", "Gaming", "Appliances"
+]
+
+products = [
+    {
+        "Electronics": [
+            ("Laptop", 80000, "High-performance laptop for studies", "https://unsplash.com/photos/laptop-computer-beside-coffee-mug-j4uuKnN43_M", 4.5, "Used", 70000, 75000, 6),
+            ("Bluetooth Headphones", 15000, "Noise-cancelling wireless headphones", "https://unsplash.com/photos/black-sunglasses-on-white-surface-yDC3NXxrtyc", 4.7, "New", 12000, 13000, 0),
+            ("Smartphone", 50000, "Latest model with advanced features", "https://unsplash.com/photos/a-white-cell-phone-sitting-on-top-of-a-pink-and-blue-background-0ej0jMwPFhQ", 4.6, "New", 45000, 47000, 0),
+            ("Smartwatch", 25000, "Fitness tracking and notifications", "https://unsplash.com/photos/shallow-focus-photography-of-silver-apple-watch-with-black-sport-band-qdY76gIYbw8", 4.4, "Used", 20000, 22000, 12),
+            ("Portable Charger", 3000, "Fast charging power bank", "https://unsplash.com/photos/white-power-adapter-G_GaeDNyMe8", 4.5, "New", 2500, 2800, 0)
+        ]
+    },
+    {
+        "Books": [
+            ("Data Structures", 2500, "Comprehensive guide to algorithms", "https://www.vijaynicole.co.in/book/isbn/9789393665676", 4.8, "Used", 2000, 2200, 6),
+            ("Machine Learning", 3000, "Introduction to ML concepts", "https://www.google.com/imgres?q=Machine%20Learning%20book&imgurl=https%3A%2F%2Fm.media-amazon.com%2Fimages%2FI%2F81cNCOaB5UL._UF1000%2C1000_QL80_.jpg&imgrefurl=https%3A%2F%2Fwww.amazon.in%2FMachine-Learning-Beginners-Artificial-Intelligence-ebook%2Fdp%2FB07MRKDM77&docid=g9yFomuSMXZdmM&tbnid=vMSeroKVPnOfjM&vet=12ahUKEwik4q3vvZSJAxUhV2wGHRzrNkgQM3oECBcQAA..i&w=625&h=1000&hcb=2&ved=2ahUKEwik4q3vvZSJAxUhV2wGHRzrNkgQM3oECBcQAA", 4.7, "New", 2500, 2800, 0),
+            ("Networking Essentials", 2800, "Understanding computer networks", "https://www.google.com/imgres?q=Networking%20Essentials&imgurl=https%3A%2F%2Fm.media-amazon.com%2Fimages%2FI%2F91B1Rp1wsYL._AC_UF1000%2C1000_QL80_.jpg&imgrefurl=https%3A%2F%2Fwww.amazon.in%2FNetworking-Essentials-3-Beasley%2Fdp%2F9332515905&docid=lwAIKJh1C-8NsM&tbnid=PMZrIYAH-6ctRM&vet=12ahUKEwiWgoKCvpSJAxVBTWcHHbhUKpIQM3oECBYQAA..i&w=799&h=1000&hcb=2&ved=2ahUKEwiWgoKCvpSJAxVBTWcHHbhUKpIQM3oECBYQAA", 4.6, "Used", 2300, 2500, 8),
+            ("Web Development", 3500, "Full stack development tutorial", "https://example.com/book4", 4.5, "New", 3000, 3200, 0),
+            ("Algorithms Unlocked", 1500, "A practical guide to algorithms", "https://www.google.com/imgres?q=Algorithms%20Unlocked&imgurl=https%3A%2F%2Fimages.pangobooks.com%2Fbook_images%2FNVqknkN5kMd62Ma2xXLjA8IVURF2%2F1643571175561_NVqknkN5kMd62Ma2xXLjA8IVURF2%3Fquality%3D85%26width%3D1200%26crop%3D1%253A1&imgrefurl=https%3A%2F%2Fapp.pangobooks.com%2Ftitles%2Falgorithms-unlocked&docid=Sf25eh_I3N0ykM&tbnid=GYgwZHASP3pnhM&vet=12ahUKEwj7m7q1wJSJAxUba_UHHU3hORgQM3oECG0QAA..i&w=1200&h=1200&hcb=2&itg=1&ved=2ahUKEwj7m7q1wJSJAxUba_UHHU3hORgQM3oECG0QAA", 4.4, "Used", 1200, 1400, 12)
+        ]
+    },
+    {
+        "Clothing": [
+            ("T-shirt", 800, "Comfortable cotton T-shirt", "https://www.istockphoto.com/photo/blue-t-shirts-front-and-back-used-as-design-template-gm831591110-135251075", 4.2, "New", 600, 700, 0),
+            ("Jeans", 1500, "Stylish denim jeans", "https://unsplash.com/photos/three-pairs-of-jeans-are-lined-up-on-a-white-surface-LK5Ud5yRuz4", 4.5, "Used", 1200, 1300, 3),
+            ("Jacket", 2500, "Warm winter jacket", "https://unsplash.com/photos/a-coat-hanging-on-a-clothes-line-M5F4vmEnxsA", 4.4, "New", 2200, 2400, 0),
+            ("Sneakers", 3000, "Casual running shoes", "https://example.com/sneakers", 4.3, "New", 2700, 2900, 0),
+            ("Sweater", 1200, "Cozy knit sweater", "https://example.com/sweater", 4.6, "Used", 1000, 1100, 5)
+        ]
+    },
+    {
+        "Sports": [
+            ("Cricket Bat", 2500, "Professional cricket bat", "https://unsplash.com/photos/a-wooden-paddle-and-two-white-balls-on-a-green-surface-wA0VClCO0OE", 4.5, "Used", 2000, 2200, 10),
+            ("Football", 1500, "High-quality football", "https://unsplash.com/photos/white-and-gray-adidas-soccerball-on-lawn-grass-qWs_Wa1JrKM", 4.4, "New", 1200, 1300, 0),
+            ("Tennis Racket", 3000, "Lightweight tennis racket", "https://example.com/racket", 4.6, "New", 2500, 2800, 0),
+            ("Badminton Set", 1200, "Includes rackets and shuttlecocks", "https://example.com/badminton", 4.5, "New", 1000, 1100, 0),
+            ("Yoga Mat", 800, "Non-slip yoga mat", "https://example.com/yoga", 4.3, "New", 600, 700, 0)
+        ]
+    },
+    {
+        "Furniture": [
+            ("Study Desk", 5000, "Spacious study desk", "https://unsplash.com/photos/busy-young-male-student-in-casualwear-and-headphones-making-notes-in-copybook-while-sitting-by-desk-in-office-frGVCVssDkI", 4.6, "Used", 4000, 4500, 12),
+            ("Chair", 2500, "Ergonomic office chair", "https://unsplash.com/photos/a-yellow-chair-and-a-black-lamp-in-a-room-ITeZugvrDS4", 4.5, "New", 2000, 2200, 0),
+            ("Bookshelf", 3000, "Stylish wooden bookshelf", "https://example.com/bookshelf", 4.4, "New", 2700, 2900, 0),
+            ("Bed Frame", 8000, "Sturdy bed frame", "https://example.com/bed", 4.7, "Used", 7000, 7500, 24),
+            ("Dining Table", 6000, "Elegant dining table", "https://unsplash.com/photos/a-dining-room-with-a-table-and-chairs-PwmeVgE6JiI", 4.5, "New", 5500, 5800, 0)
+        ]
+    },
+    {
+        "Stationery": [
+            ("Notebook", 200, "College ruled notebook", "https://unsplash.com/photos/write-ideas-book-on-brown-wooden-board-AXqMy8MSSdk", 4.8, "New", 150, 180, 0),
+            ("Pen Set", 300, "Assorted color pens", "https://unsplash.com/photos/three-black-pencils-sitting-next-to-each-other-HzLgS3u3ZDA", 4.5, "New", 250, 280, 0),
+            ("Highlighters", 150, "Set of colorful highlighters", "https://example.com/highlighters", 4.6, "New", 120, 150, 0),
+            ("Whiteboard", 1200, "Portable whiteboard", "https://example.com/whiteboard", 4.4, "Used", 1000, 1100, 10),
+            ("Sticky Notes", 100, "Pack of sticky notes", "https://www.istockphoto.com/photo/project-planning-gm918531170-252662318", 4.3, "New", 80, 100, 0)
+        ]
+    },
+    {
+        "Gaming": [
+            ("Gaming Laptop", 100000, "High-performance gaming laptop", "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-desk-gtZxq2Rpa_Y", 4.6, "Used", 90000, 95000, 6),
+            ("Console", 30000, "Latest gaming console", "https://unsplash.com/photos/a-pile-of-video-game-controllers-sitting-next-to-each-other-NnJetluNBtc", 4.5, "New", 28000, 29000, 0),
+            ("VR Headset", 25000, "Virtual reality headset", "https://unsplash.com/photos/a-black-mannequin-with-a-white-hat-on-top-of-it-PaBGXFHj4Ik", 4.4, "New", 22000, 24000, 0),
+            ("Gaming Chair", 5000, "Comfortable gaming chair", "https://example.com/gaming_chair", 4.5, "New", 4000, 4500, 0),
+            ("Game Controller", 1500, "Wireless game controller", "https://unsplash.com/photos/a-white-controller-sitting-on-top-of-a-wooden-floor-NJUuTqckplc", 4.6, "New", 1200, 1300, 0)
+        ]
+    },
+    {
+        "Appliances": [
+            ("Microwave Oven", 10000, "Compact microwave oven", "https://unsplash.com/photos/a-toaster-sitting-on-top-of-a-white-counter-RsZJU_7obYU", 4.5, "New", 9000, 9500, 0),
+            ("Refrigerator", 25000, "Energy-efficient refrigerator", "https://unsplash.com/photos/a-refrigerator-with-a-microwave-on-top-of-it-pekSK_lfOb4", 4.7, "New", 23000, 24000, 0),
+            ("Washing Machine", 20000, "Front-loading washing machine", "https://www.istockphoto.com/photo/at-home-gm1332008714-414982036", 4.6, "New", 18000, 19000, 0),
+            ("Air Conditioner", 30000, "Split air conditioner", "https://example.com/ac", 4.6, "New", 27000, 28000, 0),
+            ("Vacuum Cleaner", 8000, "Powerful vacuum cleaner", "https://unsplash.com/photos/a-woman-is-using-a-vacuum-cleaner-on-the-floor-hiSCn_YtMMI", 4.5, "New", 7000, 7500, 0)
+        ]
+    }
+]
+
