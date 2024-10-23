@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  title: CampusMart API
+  description: API documentation for the CampusMart marketplace.
+  version: 1.0.0
+servers:
+- url: http://localhost:5000/api/v1
+paths:
+  /register:
+    post:
+      summary: User Registration
+      operationId: register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/register_body'
+        required: true
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /login:
+    post:
+      summary: User Login
+      operationId: login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_body'
+        required: true
+      responses:
+        "200":
+          description: Login successful
+        "401":
+          description: Unauthorized
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /logout:
+    post:
+      summary: User Logout
+      operationId: logout_post
+      responses:
+        "200":
+          description: Logout successful
+        "401":
+          description: Unauthorized
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /profile:
+    get:
+      summary: Get User Profile
+      operationId: profile_get
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    put:
+      summary: Edit User Profile
+      operationId: profile_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/profile_body'
+        required: true
+      responses:
+        "200":
+          description: User profile updated successfully
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /listings:
+    get:
+      summary: Get All Listings
+      operationId: listings_get
+      responses:
+        "200":
+          description: A list of all listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: Create New Listing
+      operationId: listings_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/listings_body'
+        required: true
+      responses:
+        "201":
+          description: Listing created successfully
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /listings/{listing_id}:
+    get:
+      summary: Get Listing Details
+      operationId: listings_listing_id_get
+      parameters:
+      - name: listing_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Listing details retrieved successfully
+        "404":
+          description: Listing not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    put:
+      summary: Edit Listing
+      operationId: listings_listing_id_put
+      parameters:
+      - name: listing_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/listings_listing_id_body'
+        required: true
+      responses:
+        "200":
+          description: Listing updated successfully
+        "404":
+          description: Listing not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete Listing
+      operationId: listings_listing_id_delete
+      parameters:
+      - name: listing_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Listing deleted successfully
+        "404":
+          description: Listing not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /transactions/buy:
+    post:
+      summary: Buy Item
+      operationId: transactions_buy_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transactions_buy_body'
+        required: true
+      responses:
+        "200":
+          description: Purchase successful
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /transactions/history:
+    get:
+      summary: Transaction History
+      operationId: transactions_history_get
+      responses:
+        "200":
+          description: A list of user's transaction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_2'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /chat-partners:
+    get:
+      summary: Get Chat Partners
+      operationId: chat_partners_get
+      responses:
+        "200":
+          description: List of chat partners retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_3'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /messages/{user_id}:
+    get:
+      summary: Get Messages
+      operationId: messages_user_id_get
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_4'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: Send Message
+      operationId: messages_user_id_post
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/messages_user_id_body'
+        required: true
+      responses:
+        "200":
+          description: Message sent successfully
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /contact:
+    post:
+      summary: Contact Us
+      operationId: contact_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/contact_body'
+        required: true
+      responses:
+        "200":
+          description: Message sent successfully
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /terms:
+    get:
+      summary: Terms and Conditions
+      operationId: terms_get
+      responses:
+        "200":
+          description: Terms and conditions retrieved successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    register_body:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+    login_body:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+      example:
+        email: email
+        username: username
+    profile_body:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    inline_response_200_1:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        price:
+          type: number
+      example:
+        price: 6.02745618307040320615897144307382404804229736328125
+        id: 0
+        title: title
+    listings_body:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+    listings_listing_id_body:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+    transactions_buy_body:
+      type: object
+      properties:
+        listing_id:
+          type: integer
+        quantity:
+          type: integer
+    inline_response_200_2:
+      type: object
+      properties:
+        transaction_id:
+          type: integer
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+      example:
+        transaction_id: 0
+        date: 2000-01-23
+        amount: 6.02745618307040320615897144307382404804229736328125
+    inline_response_200_3:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+      example:
+        user_id: 0
+        username: username
+    inline_response_200_4:
+      type: object
+      properties:
+        message_id:
+          type: integer
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      example:
+        message_id: 0
+        content: content
+        timestamp: 2000-01-23T04:56:07.000+00:00
+    messages_user_id_body:
+      type: object
+      properties:
+        content:
+          type: string
+    contact_body:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        message:
+          type: string
+
