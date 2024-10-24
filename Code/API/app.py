@@ -1,147 +1,360 @@
 from flask import Flask, request, jsonify
-from flask_mysqldb import MySQL
+import mysql.connector
 from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
 
-# MySQL configurations
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '``````'
-app.config['MYSQL_DB'] = 'campusmart'
+# Configuration for uploading files
+app.config['UPLOAD_FOLDER'] = 'uploads'  # Define your upload folder
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # Create the folder if it doesn't exist
 
-mysql = MySQL(app)
-app.config['UPLOAD_FOLDER'] = 'uploads/'
+def get_db_connection():
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="Kapil@8333",
+            database="CampusMart"
+        )
+        print("Connection is successful")
+    except mysql.connector.Error as err:
+        print(f"Database connection error occurred: {err}")
+        return None
+    return conn
 
-# Function to save images and return their URLs
-def save_images(files):
-    image_urls = []
-    for file in files:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        image_urls.append(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return image_urls
+@app.route('/')
+def home_page():
+    return "Hello, welcome to CampusMart API!"
 
-# User registration
+# User-related endpoints
+@app.route("/users", methods=['GET'])
+def get_all_users():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT userID, name FROM Users")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users)
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO Users (username, password, email) VALUES (%s, %s, %s)",
-                   (data['username'], data['password'], data['email']))
-    mysql.connection.commit()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Users (name, email, passwordHash, userType) VALUES (%s, %s, %s, %s)",
+                   (data['name'], data['email'], data['password'], data['userType']))
+    conn.commit()
     cursor.close()
+    conn.close()
     return jsonify({'message': 'User registered successfully'}), 201
 
-# User login
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM Users WHERE username = %s AND password = %s",
-                   (data['username'], data['password']))
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT userID,name,email,phoneNumber,department,userType FROM Users WHERE email = %s AND passwordHash = %s",
+                   (data['email'], data['password']))  # Use the hashed password in practice
     user = cursor.fetchone()
     cursor.close()
+    conn.close()
+    
     if user:
         return jsonify({'message': 'Login successful', 'user': user}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
 
-# Add a new product
-@app.route('/product', methods=['POST'])
-def add_product():
-    data = request.form
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO Products (category, product_name, price, description, rating, condition, purchase_rate, selling_rate, used_for_months) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                   (data['category'], data['product_name'], data['price'], data['description'], data['rating'], data['condition'], data['purchase_rate'], data['selling_rate'], data['used_for_months']))
-    product_id = cursor.lastrowid
-    
-    files = request.files.getlist('images')
-    image_urls = save_images(files)
-    for url in image_urls:
-        cursor.execute("INSERT INTO ProductImages (product_id, image_url) VALUES (%s, %s)", (product_id, url))
-    
-    mysql.connection.commit()
-    cursor.close()
-    return jsonify({'message': 'Product added successfully'}), 201
+# Categories endpoints
+@app.route('/categories', methods=['GET'])
+def get_all_categories():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
 
-# Get all products
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Categories")
+    categories = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(categories)
+
+@app.route('/categories/<int:category_id>', methods=['GET'])
+def get_category(category_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Categories WHERE categoryID = %s", (category_id,))
+    category = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    
+    if category:
+        return jsonify(category), 200
+    else:
+        return jsonify({'error': 'Category not found'}), 404
+
+# Listings endpoints
 @app.route('/products', methods=['GET'])
 def get_products():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM Products")
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Listings")
     products = cursor.fetchall()
     cursor.close()
+    conn.close()
     return jsonify({'products': products}), 200
 
-# Get product details by id
-@app.route('/product/<int:product_id>', methods=['GET'])
+@app.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM Products WHERE id = %s", (product_id,))
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Listings WHERE listingID = %s", (product_id,))
     product = cursor.fetchone()
-    cursor.execute("SELECT image_url FROM ProductImages WHERE product_id = %s", (product_id,))
-    images = cursor.fetchall()
     cursor.close()
-    return jsonify({'product': product, 'images': images}), 200
+    conn.close()
+    
+    if product:
+        return jsonify(product), 200
+    else:
+        return jsonify({'error': 'Product not found'}), 404
 
-# Message between buyer and seller
-@app.route('/message', methods=['POST'])
-def send_message():
+@app.route('/product', methods=['POST'])
+def add_product():
     data = request.get_json()
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO Messages (sender_id, receiver_id, message, timestamp) VALUES (%s, %s, %s, NOW())",
-                   (data['sender_id'], data['receiver_id'], data['message']))
-    mysql.connection.commit()
-    cursor.close()
-    return jsonify({'message': 'Message sent successfully'}), 201
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-# Get all messages between two users
-@app.route('/messages', methods=['GET'])
-def get_messages():
-    sender_id = request.args.get('sender_id')
-    receiver_id = request.args.get('receiver_id')
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM Messages WHERE (sender_id = %s AND receiver_id = %s) OR (sender_id = %s AND receiver_id = %s) ORDER BY timestamp",
-                   (sender_id, receiver_id, receiver_id, sender_id))
-    messages = cursor.fetchall()
-    cursor.close()
-    return jsonify({'messages': messages}), 200
+    # Insert into Listings table
+    cursor.execute("INSERT INTO Listings (userID, title, description, selling_price, new_item_price, categoryID, grade) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                   (data['userID'], data['title'], data['description'], data['selling_price'], data['new_item_price'], data['categoryID'], data['grade']))
+    listing_id = cursor.lastrowid
 
-# API to get all unique contacts (users) a specific user has chatted with
-@app.route('/contacts/<int:user_id>', methods=['GET'])
-def get_contacts(user_id):
-    cursor = mysql.connection.cursor()
-    cursor.execute("""
-        SELECT DISTINCT CASE WHEN sender_id = %s THEN receiver_id ELSE sender_id END AS contact_id
-        FROM Messages
-        WHERE sender_id = %s OR receiver_id = %s
-    """, (user_id, user_id, user_id))
-    contacts = cursor.fetchall()
+    # Handle images
+    if 'images' in data:
+        for img_url in data['images']:
+            cursor.execute("INSERT INTO ListingImages (listingID, imgURL) VALUES (%s, %s)", (listing_id, img_url))
+    
+    conn.commit()
     cursor.close()
-    return jsonify({'contacts': contacts}), 200
+    conn.close()
+    return jsonify({'message': 'Product added successfully'}), 201
 
-# Update product details
 @app.route('/product/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
     data = request.get_json()
-    cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE Products SET category=%s, product_name=%s, price=%s, description=%s, rating=%s, condition=%s, purchase_rate=%s, selling_rate=%s, used_for_months=%s WHERE id=%s",
-                   (data['category'], data['product_name'], data['price'], data['description'], data['rating'], data['condition'], data['purchase_rate'], data['selling_rate'], data['used_for_months'], product_id))
-    mysql.connection.commit()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Listings SET title=%s, description=%s, selling_price=%s, new_item_price=%s, categoryID=%s, grade=%s WHERE listingID=%s",
+                   (data['title'], data['description'], data['selling_price'], data['new_item_price'], data['categoryID'], data['grade'], product_id))
+    conn.commit()
     cursor.close()
+    conn.close()
     return jsonify({'message': 'Product updated successfully'}), 200
 
-# Delete a product
 @app.route('/product/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
-    cursor = mysql.connection.cursor()
-    cursor.execute("DELETE FROM Products WHERE id = %s", (product_id,))
-    cursor.execute("DELETE FROM ProductImages WHERE product_id = %s", (product_id,))
-    mysql.connection.commit()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Listings WHERE listingID = %s", (product_id,))
+    cursor.execute("DELETE FROM ListingImages WHERE listingID = %s", (product_id,))
+    conn.commit()
     cursor.close()
+    conn.close()
     return jsonify({'message': 'Product deleted successfully'}), 200
+
+# ListingImages endpoints
+@app.route('/listing_images', methods=['GET'])
+def get_listing_images():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM ListingImages")
+    images = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(images)
+
+@app.route('/listing_images/<int:listing_id>', methods=['GET'])
+def get_listing_images_by_listing(listing_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM ListingImages WHERE listingID = %s", (listing_id,))
+    images = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(images)
+
+# Messages endpoints
+@app.route('/messages', methods=['GET'])
+def get_all_messages():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Messages")
+    messages = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(messages)
+
+@app.route('/message', methods=['POST'])
+def send_message():
+    data = request.get_json()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Messages (sender_id, receiver_id, message, timestamp) VALUES (%s, %s, %s, NOW())",
+                   (data['sender_id'], data['receiver_id'], data['message']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Message sent successfully'}), 201
+
+# Ratings endpoints
+@app.route('/ratings', methods=['GET'])
+def get_all_ratings():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Ratings")
+    ratings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(ratings)
+
+@app.route('/rating', methods=['POST'])
+def add_rating():
+    data = request.get_json()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Ratings (listingID, userID, ratingValue) VALUES (%s, %s, %s)",
+                   (data['listingID'], data['userID'], data['ratingValue']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Rating added successfully'}), 201
+
+# Transactions endpoints
+@app.route('/transactions', methods=['GET'])
+def get_all_transactions():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Transactions")
+    transactions = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(transactions)
+
+@app.route('/transaction', methods=['POST'])
+def add_transaction():
+    data = request.get_json()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Transactions (buyerID, sellerID, listingID, transactionDate) VALUES (%s, %s, %s, NOW())",
+                   (data['buyerID'], data['sellerID'], data['listingID']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Transaction added successfully'}), 201
+
+
+@app.route('/wishlist/<int:user_id>', methods=['GET'])
+def get_wishlist(user_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT l.*, w.wishlistID
+        FROM Listings l
+        JOIN Wishlists w ON l.listingID = w.listingID
+        WHERE w.userID = %s AND l.isActive = TRUE  -- Check for active listings
+    """, (user_id,))
+    wishlist_items = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(wishlist_items), 200
+@app.route('/wishlist', methods=['POST'])
+def add_to_wishlist():
+    data = request.get_json()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT isActive FROM Listings WHERE listingID = %s", (data['listingID'],))
+    listing = cursor.fetchone()
+
+    if listing is None or not listing['isActive']:
+        cursor.close()
+        conn.close()
+        return jsonify({'error': 'Listing is inactive or does not exist'}), 400  # 400 for bad request
+
+    cursor.execute("INSERT INTO Wishlists (userID, listingID) VALUES (%s, %s)",
+                   (data['userID'], data['listingID']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Product added to wishlist successfully'}), 201
+
+@app.route('/wishlist/<int:wishlist_id>', methods=['DELETE'])
+def remove_from_wishlist(wishlist_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Wishlists WHERE wishlistID = %s", (wishlist_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Product removed from wishlist successfully'}), 200
+
 
 # Start the Flask app
 if __name__ == '__main__':

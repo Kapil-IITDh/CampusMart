@@ -17,80 +17,88 @@ USE CampusMart;\
 #5 tables\
 \
 #`1\
-CREATE TABLE Users (\
-    userID INT AUTO_INCREMENT PRIMARY KEY,\
-    name VARCHAR(255) NOT NULL,\
-    email VARCHAR(255) UNIQUE NOT NULL,\
-    department VARCHAR(100),\
-    passwordHash VARCHAR(255) NOT NULL,\
-    userType ENUM('Student', 'Faculty', 'Staff') NOT NULL,\
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\
-);\
+CREATE TABLE Users (
+    userID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    department VARCHAR(100),
+    passwordHash VARCHAR(255) NOT NULL,
+    userType ENUM('Student', 'Faculty', 'Staff') NOT NULL,
+    phoneNumber VARCHAR(15),  -- Adding the phone number column
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 \
 \
 #2\
-CREATE TABLE Categories (\
-    categoryID INT AUTO_INCREMENT PRIMARY KEY,\
-    name VARCHAR(100) NOT NULL,\
-    description TEXT\
-);\
+CREATE TABLE Categories (
+    categoryID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
 \
 #3\
-CREATE TABLE Listings (\
-    listingID INT AUTO_INCREMENT PRIMARY KEY,\
-    userID INT,\
-    title VARCHAR(255) NOT NULL,\
-    description TEXT NOT NULL,\
-    price DECIMAL(10, 2) NOT NULL,\
-    categoryID INT,\
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\
-    isActive BOOLEAN DEFAULT TRUE,\
-    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,\
-    FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE SET NULL\
-);\
+CREATE TABLE Listings (
+    listingID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    selling_price DECIMAL(10, 2) NOT NULL,
+    new_item_price DECIMAL(10, 2),
+    categoryID INT,
+    grade INT CHECK (condition >= 1 AND condition <= 5),  -- Condition on a scale of 1 to 5
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    isActive BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE SET NULL
+);
+
 \
 #4\
-CREATE TABLE Transactions (\
-    transactionID INT AUTO_INCREMENT PRIMARY KEY,\
-    buyerID INT,\
-    sellerID INT,\
-    listingID INT,\
-    amount DECIMAL(10, 2) NOT NULL,\
-    status ENUM('Pending', 'Completed', 'Disputed') DEFAULT 'Pending',\
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\
-    FOREIGN KEY (buyerID) REFERENCES Users(userID) ON DELETE CASCADE,\
-    FOREIGN KEY (sellerID) REFERENCES Users(userID) ON DELETE CASCADE,\
-    FOREIGN KEY (listingID) REFERENCES Listings(listingID) ON DELETE CASCADE\
-);\
-\
+CREATE TABLE Transactions (
+    transactionID INT AUTO_INCREMENT PRIMARY KEY,
+    buyerID INT,
+    sellerID INT,
+    listingID INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('Pending', 'Completed', 'Disputed') DEFAULT 'Pending',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (buyerID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (sellerID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (listingID) REFERENCES Listings(listingID) ON DELETE CASCADE
+);
+
 #4\
-CREATE TABLE Messages (\
-    messageID INT AUTO_INCREMENT PRIMARY KEY,\
-    senderID INT,\
-    receiverID INT,\
-    content TEXT NOT NULL,\
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\
-    FOREIGN KEY (senderID) REFERENCES Users(userID) ON DELETE CASCADE,\
-    FOREIGN KEY (receiverID) REFERENCES Users(userID) ON DELETE CASCADE\
-);\
-\
-\
+CREATE TABLE Messages (
+    messageID INT AUTO_INCREMENT PRIMARY KEY,
+    senderID INT,
+    receiverID INT,
+    content TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (senderID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (receiverID) REFERENCES Users(userID) ON DELETE CASCADE
+);
+
+
 #5\
-CREATE TABLE Ratings (\
-    ratingID INT AUTO_INCREMENT PRIMARY KEY,\
-    transactionID INT,\
-    raterID INT,   -- The user giving the rating\
-    rateeID INT,   -- The user being rated\
-    rating TINYINT CHECK (rating BETWEEN 1 AND 5), -- Rating on a 5-point scale\
-    feedback TEXT,\
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\
-    FOREIGN KEY (transactionID) REFERENCES Transactions(transactionID) ON DELETE CASCADE,\
-    FOREIGN KEY (raterID) REFERENCES Users(userID) ON DELETE CASCADE,\
-    FOREIGN KEY (rateeID) REFERENCES Users(userID) ON DELETE CASCADE\
-);\
+CREATE TABLE Ratings (
+    ratingID INT AUTO_INCREMENT PRIMARY KEY,
+    transactionID INT,
+    raterID INT,   -- The user giving the rating
+    rateeID INT,   -- The user being rated
+    rating TINYINT CHECK (rating BETWEEN 1 AND 5), -- Rating on a 5-point scale
+    feedback TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (transactionID) REFERENCES Transactions(transactionID) ON DELETE CASCADE,
+    FOREIGN KEY (raterID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (rateeID) REFERENCES Users(userID) ON DELETE CASCADE
+);
+
+
 \'97\'97using \
 \pard\pardeftab720\partightenfactor0
 
@@ -115,9 +123,9 @@ GROUP BY L.listingID;\
 \
 #################\
 Indexing and optimise queries\
-CREATE INDEX idx_userID ON Listings(userID);\
-CREATE INDEX idx_buyerID ON Transactions(buyerID);\
-CREATE INDEX idx_sellerID ON Transactions(sellerID);\
+CREATE INDEX idx_userID ON Listings(userID);
+CREATE INDEX idx_buyerID ON Transactions(buyerID);
+CREATE INDEX idx_sellerID ON Transactions(sellerID);
 \
 \
 \
