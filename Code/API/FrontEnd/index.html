@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMart</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Welcome to CampusMart</h1>
+    
+    <section id="add-category">
+        <h2>Add Category</h2>
+        <form id="category-form">
+            <label for="categoryName">Category Name:</label>
+            <input type="text" id="categoryName" name="categoryName" required>
+            <button type="submit">Add Category</button>
+        </form>
+    </section>
+    
+    <section id="add-product">
+        <h2>Add Product</h2>
+        <form id="product-form">
+            <label for="userID">User ID:</label>
+            <input type="number" id="userID" name="userID" required>
+            
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+            
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="selling_price">Selling Price:</label>
+            <input type="number" step="0.01" id="selling_price" name="selling_price" required>
+            
+            <label for="new_item_price">New Item Price:</label>
+            <input type="number" step="0.01" id="new_item_price" name="new_item_price" required>
+            
+            <label for="categoryID">Category ID:</label>
+            <input type="number" id="categoryID" name="categoryID" required>
+            
+            <label for="grade">Grade:</label>
+            <input type="number" id="grade" name="grade" min="1" max="5" required>
+            
+            <label for="images">Image URLs (comma separated):</label>
+            <input type="text" id="images" name="images">
+            
+            <button type="submit">Add Product</button>
+        </form>
+    </section>
+    
+    <section id="view-categories">
+        <h2>View Categories</h2>
+        <button id="view-categories-btn">View Categories</button>
+        <ul id="categories-list"></ul>
+    </section>
+    
+    <section id="view-products">
+        <h2>View Products</h2>
+        <button id="view-products-btn">View Products</button>
+        <ul id="products-list"></ul>
+    </section>
+    
+    <script src="script.js"></script>
+</body>
+</html>

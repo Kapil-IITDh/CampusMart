@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify
 import mysql.connector
-from werkzeug.utils import secure_filename
+from flask_cors import CORS
+
 import os
 
 app = Flask(__name__)
+CORS(app) #allow all origin
+# CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
+
+
 
 # Configuration for uploading files
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Define your upload folder
@@ -25,7 +30,7 @@ def get_db_connection():
 
 @app.route('/')
 def home_page():
-    return "Hello, welcome to CampusMart API!"
+    return jsonify(message="Hello, welcome to CampusMart API!")
 
 # User-related endpoints
 @app.route("/users", methods=['GET'])
@@ -88,6 +93,10 @@ def get_all_categories():
     cursor.close()
     conn.close()
     return jsonify(categories)
+
+
+
+
 
 @app.route('/categories/<int:category_id>', methods=['GET'])
 def get_category(category_id):
@@ -215,18 +224,24 @@ def get_listing_images_by_listing(listing_id):
     return jsonify(images)
 
 # Messages endpoints
-@app.route('/messages', methods=['GET'])
-def get_all_messages():
+@app.route('/messages/<int:user_id>', methods=['GET'])
+def get_all_messages(user_id):
     conn = get_db_connection()
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Messages")
+    cursor.execute("""
+        SELECT * FROM Messages
+        WHERE sender_id = %s OR receiver_id = %s
+        ORDER BY timestamp
+    """, (user_id, user_id))
     messages = cursor.fetchall()
     cursor.close()
     conn.close()
-    return jsonify(messages)
+    
+    return jsonify(messages), 200
+
 
 @app.route('/message', methods=['POST'])
 def send_message():
@@ -358,4 +373,5 @@ def remove_from_wishlist(wishlist_id):
 
 # Start the Flask app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5000,debug=True)
+
