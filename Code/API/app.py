@@ -157,6 +157,9 @@ def get_category(category_id):
         return jsonify({'error': 'Category not found'}), 404
 
 # Listings endpoints
+import json
+
+# Listings endpoints
 @app.route('/products', methods=['GET'])
 def get_products():
     conn = get_db_connection()

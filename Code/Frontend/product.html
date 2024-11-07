@@ -59,7 +59,18 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('product_id');
         }
-
+        const isLoggedIn = localStorage.getItem('isLoggedIn')==='1';
+        function makeOffer(){
+            console.log(isLoggedIn);
+            if(isLoggedIn){
+                window.location.href ="message.html";
+            }else{
+                window.location.href ="SignIn.html";
+            }
+            
+            
+        }
+        
         // Function to show the loading indicator and hide product container
         // function showLoading() {
         //     document.getElementById('loadingIndicator').style.display = 'block';
@@ -91,7 +102,7 @@
                     console.log('Product details:', product);
 
                     // Populate the main product image
-                    document.getElementById("product-image").src = product.imageURLs[0] || 'https://via.placeholder.com/300';
+                    document.getElementById("product-image").src = product.imageURLs[0] =='null'?product.imageURLs[0]:  'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg';
                     document.getElementById("product-title").textContent = product.title;
                     document.getElementById("product-price").textContent = `₹ ${product.selling_price}`;
                     document.getElementById("product-description").textContent = product.description;

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging Page</title>
+    <link rel="stylesheet" href="assets/css/message.css">
+    <link rel="stylesheet" href="./assets/css/NavbarFirst.css">
+    <link rel="stylesheet" href="./assets/css/NavbarSecond.css">
+</head>
+<body>
+    <div id="NavbarFirst"></div>
+    <div id="NavbarSecond" style="display: none;"></div>
+
+    <div class="chat-header" id="chatHeader">Select a user to start chatting</div>
+
+    <!-- Main container to hold sidebar and chat -->
+    <div class="container">
+        <div class="sidebar">
+            <h2>Chats</h2>
+            <ul class="user-list" id="userList"></ul>
+        </div>
+        
+        <div class="chat-container">
+            <div class="message-list" id="messageList"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type your message...">
+                <button id='sendButton'>Send</button>
+                <button onclick="fecth()">Fetch</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/HeaderFooter.js"></script>
+    <script src="js/LoginStatus.js"></script>
+    <script src="js/message.js"></script>
+</body>
+</html>
