@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    
+    <!-- CSS files -->
+    <link rel="stylesheet" href="./assets/css/product.css">
+    <link rel="stylesheet" href="./assets/css/NavbarFirst.css">
+    <link rel="stylesheet" href="./assets/css/NavbarSecond.css">
+    <link rel="stylesheet" href="./assets/css/Footer.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div id="NavbarFirst"></div>
+    <div id="NavbarSecond" style="display: none;"></div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" style="color: #ADD8E6; text-align: center; font-size: 20px; display: none;">
+        Loading product details...
+    </div>
+
+    <!-- Product Container -->
+    <div class="product-container" id="productContainer" >
+        <!-- Product Image and Seller Info -->
+        <div class="product-image-container">
+            <img id="product-image" src="" alt="Product Image">
+            <div class="seller-info">
+                <p id="seller-name"></p>
+                <p id="seller-rating"></p>
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+            <h2 id="product-title"></h2>
+            <p id="product-price" class="price"></p>
+            <p id="product-description" class="description"></p>
+            <button class="offer-btn" onclick="makeOffer()" >Make an offer</button>
+        </div>
+    </div>
+  
+    <!-- Footer -->
+    <footer>
+        <div id="Footer"></div>
+    </footer>
+
+    <!-- JavaScript files -->
+    <script src="js/HeaderFooter.js"></script>
+    <script src="js/LoginStatus.js"></script>
+
+    <!-- Inline JavaScript -->
+    <script>
+        // Function to get the product_id from the URL
+        function getProductIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('product_id');
+        }
+
+        // Function to show the loading indicator and hide product container
+        // function showLoading() {
+        //     document.getElementById('loadingIndicator').style.display = 'block';
+        //     document.querySelector('.product-container').style.display = 'none';
+        // }
+
+        // Function to hide the loading indicator and show product container
+        // function hideLoading() {
+        //     document.getElementById('loadingIndicator').style.display = 'none';
+        //     document.querySelector('.product-container').style.display = 'block';
+        // }
+
+        // Function to fetch and display product details
+        async function fetchProductDetails() {
+            const productId = getProductIdFromUrl();
+            if (!productId) {
+                console.error('Product ID not found in the URL');
+                document.getElementById("loadingIndicator").textContent = "Product ID not found.";
+                return;
+            }
+
+            // Show loading indicator
+            // showLoading();
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/products/${productId}`);
+                if (response.ok) {
+                    const product = await response.json();
+                    console.log('Product details:', product);
+
+                    // Populate the main product image
+                    document.getElementById("product-image").src = product.imageURLs[0] || 'https://via.placeholder.com/300';
+                    document.getElementById("product-title").textContent = product.title;
+                    document.getElementById("product-price").textContent = `₹ ${product.selling_price}`;
+                    document.getElementById("product-description").textContent = product.description;
+                    document.getElementById("seller-name").textContent = `Seller ID: ${product.userID}`; // Replace with actual seller info if available
+                    document.getElementById("seller-rating").textContent = "Seller's Rating"; // Replace with real rating data if available
+
+                    // Append additional images within the product-image-container
+                    const imageContainer = document.querySelector('.product-image-container');
+                    product.imageURLs.slice(1).forEach((url) => {
+                        const additionalImg = document.createElement('img');
+                        additionalImg.src = url;
+                        additionalImg.alt = product.title;
+                        additionalImg.width = 150; // Adjust size as needed
+                        additionalImg.style.marginRight = '10px'; // Space between images
+                        additionalImg.style.marginTop = '10px'; // Space below the main image
+                        imageContainer.appendChild(additionalImg);
+                    });
+
+                    // Hide loading indicator and show product details
+                    // hideLoading();
+                } else {
+                    console.error('Failed to fetch product details:', response.statusText);
+                    document.getElementById("loadingIndicator").textContent = "Product not found.";
+                    // hideLoading();
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                document.getElementById("loadingIndicator").textContent = "An error occurred. Please try again.";
+                // hideLoading();
+            }
+        }
+
+        // Call the function to fetch and display product details on page load
+        document.addEventListener('DOMContentLoaded', fetchProductDetails);
+    </script>
+</body>
+
+</html>

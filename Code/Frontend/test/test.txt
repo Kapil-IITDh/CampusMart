@@ -1,0 +1,36 @@
+// document.addEventListener("DOMContentLoaded", function () {
+//     // Define the base URL for the project
+//     const baseUrl = window.location.origin;
+
+//     // Load the first navbar
+//     fetch(baseUrl + '/Navbar/NavbarFirst.html')
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById('NavbarFirst').innerHTML = data;
+//             // After loading the first navbar, check login status
+//             checkLoginStatus();
+//         })
+//         .catch(error => console.error('Error loading the navbar:', error));
+
+//     // Load the second navbar
+//     fetch(baseUrl + '/Navbar/NavbarSecond.html')
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById('NavbarSecond').innerHTML = data;
+//         })
+//         .catch(error => console.error('Error loading the navbar:', error));
+
+//     // Load the footer
+//     fetch(baseUrl + '/Footer/Footer.html')
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById('Footer').innerHTML = data;
+//         })
+//         .catch(error => console.error('Error loading the footer:', error));
+// });
+
+// // Function to check login status and update the UI
+// function checkLoginStatus() {
+//     const isLoggedIn = localStorage.getItem('isLoggedIn') === '1';
+//     updateLoginStatus(isLoggedIn);
+// }

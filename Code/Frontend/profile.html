@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSS file -->
+    <link rel="stylesheet" href="./assets/css/profile.css">
+    <link rel="stylesheet" href="./assets/css/NavbarFirst.css">
+    <link rel="stylesheet" href="./assets/css/NavbarSecond.css">
+    <link rel="stylesheet" href="./assets/css/Footer.css">
+
+    <title>Profile</title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div id="NavbarFirst"></div>
+    <div id="NavbarSecond" style="display: none;"></div>
+
+
+
+    <!-- Account Heading -->
+    <h2>Account</h2>
+
+    <div class="account-container">
+        <div class="account-sidebar">
+            <p>Account</p>
+            <p>Transaction</p>
+            <p>Manage listing</p>
+            <button class="logout-btn" onclick="signOut()">Logout</button>
+            <p>Your Rating</p>
+            <div class="rating-box">5 stars</div>
+        </div>
+
+        <div class="account-details">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="First Last Name" readonly>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="email@example.com" readonly>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone number:</label>
+                <input type="text" id="phone" placeholder="1234567890" readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Password" readonly>
+            </div>
+            <button class="edit-btn">Edit</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div id="Footer"></div>
+    </footer>
+
+    <!-- JavaScript for dummy data -->
+    <script>
+        const userData = {
+            createdAt: "Thu, 24 Oct 2024 13:47:49 GMT",
+            department: "Computer Science",
+            email: "kapil@iitdh.ac.in",
+            name: "Kapil",
+            phoneNumber: "1234567890",
+            updatedAt: "Thu, 24 Oct 2024 13:47:49 GMT",
+            userID: 1,
+            userType: "Student"
+        };
+
+        // Populate the HTML elements with the dummy data
+        document.getElementById("name").value = userData.name;
+        document.getElementById("email").value = userData.email;
+        document.getElementById("phone").value = userData.phoneNumber;
+        document.getElementById("password").value = "Password"; // Placeholder for password
+    </script>
+
+    <!-- Javascript file -->
+    <script src="js/HeaderFooter.js"></script>
+    <script src="js/LoginStatus.js"></script>
+    <script src="js/products.js"></script>
+</body>
+
+</html>

@@ -32,18 +32,41 @@ def home_page():
     return jsonify(message="Hello, welcome to CampusMart API!")
 
 # User-related endpoints
-@app.route("/users", methods=['GET'])
-def get_all_users():
+# @app.route("/users", methods=['GET'])
+# def get_all_users():
+#     conn = get_db_connection()
+#     if conn is None:
+#         return jsonify({'error': 'Database connection failed'}), 500
+
+#     cursor = conn.cursor(dictionary=True)
+#     cursor.execute("SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt FROM Users")
+#     users = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return jsonify(users)
+
+@app.route("/users/<int:user_id>", methods=['GET'])
+def get_user(user_id):
     conn = get_db_connection()
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT userID, name FROM Users")
-    users = cursor.fetchall()
+    cursor.execute("""
+        SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt 
+        FROM Users 
+        WHERE userID = %s
+    """, (user_id,))
+    
+    user = cursor.fetchone()
     cursor.close()
     conn.close()
-    return jsonify(users)
+    
+    if user:
+        return jsonify(user), 200
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -52,13 +75,31 @@ def register():
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO Users (name, email, passwordHash, userType) VALUES (%s, %s, %s, %s)",
-                   (data['name'], data['email'], data['password'], data['userType']))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'message': 'User registered successfully'}), 201
+    # Validate that userType is one of the ENUM values
+    if data['userType'] not in ['Student', 'Faculty', 'Staff']:
+        return jsonify({'error': 'Invalid userType. Must be "Student", "Faculty", or "Staff".'}), 400
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO Users (name, email, department, passwordHash, userType, phoneNumber)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (data['name'], data['email'], data['department'], data['password'], data['userType'], data['phoneNumber']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'message': 'User registered successfully'}), 201
+
+    except Exception as e:
+        # Handle potential errors, such as duplicate email
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        return jsonify({'error': str(e)}), 400
+
+
+from flask import request, jsonify
+import hashlib
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -68,16 +109,17 @@ def login():
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT userID,name,email,phoneNumber,department,userType FROM Users WHERE email = %s AND passwordHash = %s",
-                   (data['email'], data['password']))  # Use the hashed password in practice
+    cursor.execute("SELECT userID, name, email, phoneNumber, department, userType FROM Users WHERE email = %s AND passwordHash = %s",
+                   (data['email'], data['password']))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
-    
+
     if user:
         return jsonify({'message': 'Login successful', 'user': user}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
+
 
 # Categories endpoints
 @app.route('/categories', methods=['GET'])
@@ -122,11 +164,24 @@ def get_products():
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Listings")
+    cursor.execute("""
+        SELECT 
+            l.*, 
+            COALESCE(JSON_ARRAYAGG(li.imgURL), JSON_ARRAY()) AS imageURLs
+        FROM Listings l
+        LEFT JOIN ListingImages li ON l.listingID = li.listingID
+        GROUP BY l.listingID
+    """)
+    
     products = cursor.fetchall()
     cursor.close()
     conn.close()
-    return jsonify({'products': products}), 200
+
+    if products:
+        return jsonify({'products': products}), 200
+    else:
+        return jsonify({'error': 'No products found'}), 404
+
 
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
@@ -135,7 +190,16 @@ def get_product(product_id):
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Listings WHERE listingID = %s", (product_id,))
+    cursor.execute("""
+        SELECT 
+            l.*, 
+            COALESCE(JSON_ARRAYAGG(li.imgURL), JSON_ARRAY()) AS imageURLs
+        FROM Listings l
+        LEFT JOIN ListingImages li ON l.listingID = li.listingID
+        WHERE l.listingID = %s
+        GROUP BY l.listingID
+    """, (product_id,))
+    
     product = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -144,6 +208,7 @@ def get_product(product_id):
         return jsonify(product), 200
     else:
         return jsonify({'error': 'Product not found'}), 404
+
 
 @app.route('/product', methods=['POST'])
 def add_product():
@@ -231,15 +296,27 @@ def get_all_messages(user_id):
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT * FROM Messages
-        WHERE sender_id = %s OR receiver_id = %s
-        ORDER BY timestamp
+        SELECT 
+            m.messageID,
+            m.senderID,
+            sender.name AS senderName,
+            m.receiverID,
+            receiver.name AS receiverName,
+            m.content,
+            m.createdAt
+        FROM Messages m
+        JOIN Users sender ON m.senderID = sender.userID
+        JOIN Users receiver ON m.receiverID = receiver.userID
+        WHERE m.senderID = %s OR m.receiverID = %s
+        ORDER BY m.createdAt
     """, (user_id, user_id))
+    
     messages = cursor.fetchall()
     cursor.close()
     conn.close()
     
     return jsonify(messages), 200
+
 
 
 @app.route('/message', methods=['POST'])
@@ -250,12 +327,49 @@ def send_message():
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Messages (sender_id, receiver_id, message, timestamp) VALUES (%s, %s, %s, NOW())",
-                   (data['sender_id'], data['receiver_id'], data['message']))
+    # Corrected SQL statement: removed the semicolon within the SQL string
+    cursor.execute(
+        "INSERT INTO Messages (senderID, receiverID, content, createdAt) VALUES (%s, %s, %s, NOW())",
+        (data['sender_id'], data['receiver_id'], data['message'])
+    )
     conn.commit()
     cursor.close()
     conn.close()
     return jsonify({'message': 'Message sent successfully'}), 201
+
+
+@app.route('/users/<int:user_id>/chats', methods=['GET'])
+def get_chatted_users(user_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT DISTINCT
+            CASE
+                WHEN m.senderID = %s THEN m.receiverID
+                ELSE m.senderID
+            END AS user_id,
+            CASE
+                WHEN m.senderID = %s THEN u2.name
+                ELSE u1.name
+            END AS user_name
+        FROM Messages m
+        JOIN Users u1 ON m.senderID = u1.userID
+        JOIN Users u2 ON m.receiverID = u2.userID
+        WHERE m.senderID = %s OR m.receiverID = %s
+    """, (user_id, user_id, user_id, user_id))
+
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return jsonify(users), 200
+
+
+
+
 
 # Ratings endpoints
 @app.route('/ratings', methods=['GET'])

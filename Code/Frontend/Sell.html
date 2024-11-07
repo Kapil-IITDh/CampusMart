@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSS file -->
+    <link rel="stylesheet" href="./assets/css/Sell.css">
+    <link rel="stylesheet" href="./assets/css/NavbarFirst.css">
+    <link rel="stylesheet" href="./assets/css/NavbarSecond.css">
+    <link rel="stylesheet" href="./assets/css/Footer.css">
+
+    <title>Sell</title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div id="NavbarFirst"></div>
+    <div id="NavbarSecond" style="display: none;"></div>
+
+    <div class="sell-container">
+        <h2>Sell</h2>
+        <form action="/sell" method="POST" enctype="multipart/form-data" class="sell-form">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" placeholder="Product name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" placeholder="Price" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" placeholder="Description of the product." rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="images">Upload images:</label>
+                <input type="file" id="images" name="images" accept="image/*" multiple required>
+                <p class="image-note">Select at least 3</p>
+            </div>
+
+            <button type="submit" class="sell-btn">Sell</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div id="Footer"></div>
+    </footer>
+
+    <!-- Javascript file -->
+    <script src="js/HeaderFooter.js"></script>
+    <script src="js/LoginStatus.js"></script>
+    <script src="js/products.js"></script>
+</body>
+
+</html>

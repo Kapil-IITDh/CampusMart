@@ -1,0 +1,59 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.productBlockContainer {
+    padding-top: 50px;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-around; 
+    gap: 20px; 
+    max-width: 100%;
+}
+
+.productBlock {
+    width: 256px;
+    height: 256px;
+}
+
+.border {
+    background: #ffffff;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 2px;
+    width: 256px;
+    height: 256px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+}
+
+.productImage {
+    border-radius: 10px;
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+}
+
+.productTitle, .productPrice {
+    margin: 10px 0 0 0;
+}
+
+footer {
+    margin-top: auto;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}

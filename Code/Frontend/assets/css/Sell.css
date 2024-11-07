@@ -1,0 +1,145 @@
+/* General styling for the Sell page */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.sell-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: "Inter-Regular", sans-serif;
+    text-decoration: none;
+    color: black;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
+
+.sell-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000000;
+    text-align: center;
+}
+
+.sell-form .form-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.sell-form label {
+    font-size: 16px;
+    color: #333;
+    width: 30%;
+}
+
+.sell-form input[type="text"],
+.sell-form input[type="number"],
+.sell-form textarea,
+.sell-form input[type="file"] {
+    width: 65%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.sell-form input[type="file"] {
+    padding: 5px;
+    font-size: 14px;
+}
+
+.sell-form textarea {
+    resize: vertical;
+}
+
+.image-note {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+    width: 100%;
+    text-align: right;
+}
+
+.sell-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #ffcccb;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.sell-btn:hover {
+    background-color: #e65c5c;
+}
+
+.upload-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #ddd;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    /* Adds spacing between file input and upload button */
+    transition: background-color 0.3s ease;
+}
+
+.upload-btn:hover {
+    background-color: #ccc;
+}
+
+footer {
+    margin-top: auto;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+/* Responsive adjustment for smaller screens */
+@media (max-width: 600px) {
+    .sell-container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .sell-container h2 {
+        font-size: 20px;
+    }
+
+    .sell-form .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sell-form label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .sell-form input[type="text"],
+    .sell-form input[type="number"],
+    .sell-form textarea,
+    .sell-form input[type="file"],
+    .upload-btn {
+        width: 100%;
+    }
+
+    .image-note {
+        text-align: left;
+    }
+}
