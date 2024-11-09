@@ -1,4 +1,4 @@
-const currentUserId = 1; // Replace with the logged-in user ID
+const currentUserId = 5; // Replace with the logged-in user ID
 let selectedUserId = null;
 
 // Temporary list of users (Replace this with data fetched from your backend in production)

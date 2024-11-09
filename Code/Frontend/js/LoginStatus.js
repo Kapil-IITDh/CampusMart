@@ -2,6 +2,7 @@
 function updateLoginStatus(isLoggedIn) {
     const loginLink = document.getElementById('loginLink');
     const navbarSecond = document.getElementById('NavbarSecond');
+    
 
     if (isLoggedIn) {
         loginLink.textContent = 'Profile';
