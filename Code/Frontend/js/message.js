@@ -1,8 +1,9 @@
-const currentUserId = 5; // Replace with the logged-in user ID
+
+const currentUserId = window.userId; // Replace with the logged-in user ID
 let selectedUserId = null;
 
 // Temporary list of users (Replace this with data fetched from your backend in production)
-const temporaryUsers = [
+const userChatList = [
     { user_id: 2, name: 'mridul' },
     { user_id: 3, name: 'manish' },
     { user_id: 4, name: 'kamla' },
@@ -15,7 +16,7 @@ function loadTemporaryUserList() {
     userList.innerHTML = ''; // Clear the existing user list
 
     // Populate the sidebar with the temporary list of users
-    temporaryUsers.forEach(user => {
+    userChatList.forEach(user => {
         const userItem = document.createElement('li');
         userItem.classList.add('user-item');
         userItem.textContent = user.name; // Display the user's name

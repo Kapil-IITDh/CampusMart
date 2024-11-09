@@ -80,15 +80,28 @@ def register():
         return jsonify({'error': 'Invalid userType. Must be "Student", "Faculty", or "Staff".'}), 400
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             INSERT INTO Users (name, email, department, passwordHash, userType, phoneNumber)
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (data['name'], data['email'], data['department'], data['password'], data['userType'], data['phoneNumber']))
         conn.commit()
+
+        # Retrieve the newly created user data without sensitive fields
+        cursor.execute("""
+            SELECT userID, name, email, department, userType, phoneNumber
+            FROM Users
+            WHERE email = %s
+        """, (data['email'],))
+        new_user = cursor.fetchone()
+
         cursor.close()
         conn.close()
-        return jsonify({'message': 'User registered successfully'}), 201
+
+        if new_user:
+            return jsonify({'message': 'User registered successfully', 'user': new_user}), 201
+        else:
+            return jsonify({'error': 'User registration failed'}), 400
 
     except Exception as e:
         # Handle potential errors, such as duplicate email
@@ -96,6 +109,7 @@ def register():
         cursor.close()
         conn.close()
         return jsonify({'error': str(e)}), 400
+
 
 
 from flask import request, jsonify
@@ -433,23 +447,6 @@ def add_transaction():
     return jsonify({'message': 'Transaction added successfully'}), 201
 
 
-@app.route('/wishlist/<int:user_id>', methods=['GET'])
-def get_wishlist(user_id):
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({'error': 'Database connection failed'}), 500
-
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT l.*, w.wishlistID
-        FROM Listings l
-        JOIN Wishlists w ON l.listingID = w.listingID
-        WHERE w.userID = %s AND l.isActive = TRUE  -- Check for active listings
-    """, (user_id,))
-    wishlist_items = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(wishlist_items), 200
 @app.route('/wishlist', methods=['POST'])
 def add_to_wishlist():
     data = request.get_json()
@@ -457,21 +454,26 @@ def add_to_wishlist():
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)  # Ensure dictionary output
+
+    # Query to check if the listing is active
     cursor.execute("SELECT isActive FROM Listings WHERE listingID = %s", (data['listingID'],))
     listing = cursor.fetchone()
 
-    if listing is None or not listing['isActive']:
+    if listing is None or not listing['isActive']:  # This now correctly checks the value
         cursor.close()
         conn.close()
         return jsonify({'error': 'Listing is inactive or does not exist'}), 400  # 400 for bad request
 
+    # Insert the listing into the Wishlists table
     cursor.execute("INSERT INTO Wishlists (userID, listingID) VALUES (%s, %s)",
                    (data['userID'], data['listingID']))
     conn.commit()
     cursor.close()
     conn.close()
+
     return jsonify({'message': 'Product added to wishlist successfully'}), 201
+
 
 @app.route('/wishlist/<int:wishlist_id>', methods=['DELETE'])
 def remove_from_wishlist(wishlist_id):
@@ -485,6 +487,38 @@ def remove_from_wishlist(wishlist_id):
     cursor.close()
     conn.close()
     return jsonify({'message': 'Product removed from wishlist successfully'}), 200
+
+
+@app.route('/wishlist/<int:user_id>', methods=['GET'])
+def get_wishlist(user_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            w.listingID,
+            l.title,
+            l.selling_price,
+            l.description,
+            IFNULL(JSON_ARRAYAGG(li.imgURL), JSON_ARRAY()) AS imageURLs
+        FROM Wishlists w
+        JOIN Listings l ON w.listingID = l.listingID
+        LEFT JOIN ListingImages li ON l.listingID = li.listingID
+        WHERE w.userID = %s
+        GROUP BY w.listingID
+    """, (user_id,))
+
+    wishlist = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    if wishlist:
+        return jsonify({'products': wishlist}), 200
+    else:
+        return jsonify({'error': 'No wishlist items found'}), 404
+
 
 
 # Start the Flask app

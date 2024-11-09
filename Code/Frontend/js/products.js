@@ -42,11 +42,11 @@ function displayProducts(dataset) {
           productBlock.href = productPageUrl; // Make the entire card clickable
           productBlock.style.textDecoration = 'none'; // Remove underline
           productBlock.style.color = 'inherit'; // Inherit color
-
+            console.log("ImageUrls: ${imageURLs}",imageURLs);
           productBlock.innerHTML = `
               <div class="border">
                   <div class="productImage">
-                  <img src="${ imageURLs[0]=='null' ? imageURLs[0] : 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?q=80&w=1232&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}" alt="${title}" width="180" height="180">
+                  <img src="${ Array.isArray(imageURLs) && imageURLs[0] ? imageURLs[0] : 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?q=80&w=1232&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}" alt="${title}" width="180" height="180">
 
                      </div>
                   <div class="productTitle">${title}</div>
@@ -61,6 +61,7 @@ function displayProducts(dataset) {
       console.log('No products found in the dataset.');
   }
 }
+
 
 // Call the function to fetch and display products on page load
 fetchProducts();

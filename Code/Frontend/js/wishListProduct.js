@@ -1,5 +1,5 @@
 // Sample test dataset to simulate real product data
-const testDataset = {
+var wishListItems = {
     products: [
         {
             listingID: 1,
@@ -10,35 +10,12 @@ const testDataset = {
                 'https://images.unsplash.com/photo-1542751110-70e56cd58e6e'
             ]
         },
-        {
-            listingID: 2,
-            title: "Bicycle",
-            selling_price: 15000,
-            description: "Mountain bicycle with a sturdy frame and suspension.",
-            imageURLs: [
-                'https://images.unsplash.com/photo-1519887386798-e0b5d70ff4ff'
-            ]
-        },
-        {
-            listingID: 3,
-            title: "Shoe Rack",
-            selling_price: 2500,
-            description: "Wooden shoe rack with 5 shelves.",
-            imageURLs: [
-                'https://images.unsplash.com/photo-1590712617227-8a0b6a6f1d07'
-            ]
-        },
-        {
-            listingID: 4,
-            title: "Smartphone",
-            selling_price: 30000,
-            description: "Latest smartphone with a powerful camera and battery life.",
-            imageURLs: [
-                'https://images.unsplash.com/photo-1593630355331-25f27ab0c8c1'
-            ]
-        }
     ]
 };
+localStorage.setItem('wishListItems',JSON.stringify(wishListItems));
+console.log("hello duniya");
+
+
 
 // Function to display products dynamically
 function displayProducts(dataset) {
@@ -52,7 +29,7 @@ function displayProducts(dataset) {
         // Loop through each product in the products array
         dataset.products.forEach((product, index) => {
             const { listingID, title, selling_price, imageURLs } = product;
-
+            console.log(`Image URLs:`, imageURLs);
             // Create the URL for the individual product page
             const productPageUrl = `product.html?product_id=${listingID}`;
 
@@ -64,7 +41,7 @@ function displayProducts(dataset) {
             productBlock.innerHTML = `
                 <div class="border">
                     <div class="productImage">
-                        <img src="${imageURLs[0]=='null' ? imageURLs[0] : 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?q=80&w=1232&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}" alt="${title}" width="180" height="180">
+                        <img src="${imageURLs[0] ? imageURLs[0] : 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?q=80&w=1232&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}" alt="${title}" width="180" height="180">
                     </div>
                     <div class="productDetails">
                         <div class="productTitle">${title}</div>
@@ -101,11 +78,11 @@ function handleDelete(event) {
     const listingID = productBlock.dataset.listingID;  // Get the listing ID from the data attribute
 
     // Find the product in the dataset based on listingID
-    const productIndex = testDataset.products.findIndex(product => product.listingID === parseInt(listingID));
+    const productIndex = wishListItems.products.findIndex(product => product.listingID === parseInt(listingID));
 
     if (productIndex !== -1) {
         // Remove the product from the dataset
-        testDataset.products.splice(productIndex, 1);
+        wishListItems.products.splice(productIndex, 1);
 
         // Remove the product block from the DOM
         productBlock.remove();
@@ -115,6 +92,41 @@ function handleDelete(event) {
 }
 
 // Test the displayProducts function by passing the test dataset
+
+
+
+// Function to fetch the wishlist from the server
+async function fetchWishlist(userId) {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/wishlist/${userId}`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Wishlist data fetched:', data);
+
+            // Update the `wishListItems` and save to localStorage
+            wishListItems = data;
+            localStorage.setItem('wishListItems', JSON.stringify(wishListItems));
+
+            // Display the products in the wishlist
+            displayProducts(wishListItems);
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to fetch wishlist:', errorData.error);
+        }
+    } catch (error) {
+        console.error('Error while fetching wishlist:', error);
+    }
+}
+
+
+
 window.onload = function() {
-    displayProducts(testDataset);
+    const user = JSON.parse(localStorage.getItem('user'));  // Ensure the user data is stored during login
+    const userId = user ? user.userID : null;
+    alert(userId);
+    if (userId) {
+        fetchWishlist(userId);
+    } else {
+        console.log('User is not logged in. Please log in to view the wishlist.');
+    }
 };

@@ -40,8 +40,10 @@
             <p id="product-price" class="price"></p>
             <p id="product-description" class="description"></p>
             <button class="offer-btn" onclick="makeOffer()" >Make an offer</button>
+            <button class="offer-btn" onclick="addToWishlist()">Add to Wishlist</button>
         </div>
     </div>
+
   
     <!-- Footer -->
     <footer>
@@ -51,6 +53,9 @@
     <!-- JavaScript files -->
     <script src="js/HeaderFooter.js"></script>
     <script src="js/LoginStatus.js"></script>
+    <script src="js/SignIn.js"></script>
+    <script src="js/Signup.js"></script>
+    
 
     <!-- Inline JavaScript -->
     <script>
@@ -86,9 +91,9 @@
         // Function to fetch and display product details
         async function fetchProductDetails() {
             const productId = getProductIdFromUrl();
+            window.productId=productId;
             if (!productId) {
                 console.error('Product ID not found in the URL');
-                document.getElementById("loadingIndicator").textContent = "Product ID not found.";
                 return;
             }
 
@@ -100,7 +105,7 @@
                 if (response.ok) {
                     const product = await response.json();
                     console.log('Product details:', product);
-
+                    alert('responseok');
                     // Populate the main product image
                     document.getElementById("product-image").src = product.imageURLs[0] =='null'?product.imageURLs[0]:  'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg';
                     document.getElementById("product-title").textContent = product.title;
@@ -110,31 +115,77 @@
                     document.getElementById("seller-rating").textContent = "Seller's Rating"; // Replace with real rating data if available
 
                     // Append additional images within the product-image-container
-                    const imageContainer = document.querySelector('.product-image-container');
-                    product.imageURLs.slice(1).forEach((url) => {
-                        const additionalImg = document.createElement('img');
-                        additionalImg.src = url;
-                        additionalImg.alt = product.title;
-                        additionalImg.width = 150; // Adjust size as needed
-                        additionalImg.style.marginRight = '10px'; // Space between images
-                        additionalImg.style.marginTop = '10px'; // Space below the main image
-                        imageContainer.appendChild(additionalImg);
-                    });
+                    // const imageContainer = document.querySelector('.product-image-container');
+                    // product.imageURLs.slice(1).forEach((url) => {
+                    //     const additionalImg = document.createElement('img');
+                    //     additionalImg.src = url;
+                    //     additionalImg.alt = product.title;
+                    //     additionalImg.width = 150; // Adjust size as needed
+                    //     additionalImg.style.marginRight = '10px'; // Space between images
+                    //     additionalImg.style.marginTop = '10px'; // Space below the main image
+                    //     imageContainer.appendChild(additionalImg);
+                    // });
 
                     // Hide loading indicator and show product details
                     // hideLoading();
                 } else {
                     console.error('Failed to fetch product details:', response.statusText);
-                    document.getElementById("loadingIndicator").textContent = "Product not found.";
+                    // document.getElementById("loadingIndicator").textContent = "Product not found.";
                     // hideLoading();
                 }
             } catch (error) {
                 console.error('Error fetching product details:', error);
-                document.getElementById("loadingIndicator").textContent = "An error occurred. Please try again.";
+                // document.getElementById("loadingIndicator").textContent = "An error occurred. Please try again.";
                 // hideLoading();
             }
         }
 
+        // mark as favorite
+        async function addToWishlist() {
+            const productId = getProductIdFromUrl();
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.userID : null;
+            alert((userId));
+            if (!userId) {
+                alert("Please log in to add products to your wishlist.");
+                window.location.href ="SignIn.html";
+                return;
+            }
+
+            try {
+                // Make the API call to add the product to the wishlist
+                const response = await fetch('http://127.0.0.1:5000/wishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "userID": userId,
+                        "listingID": window.productId,
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message); // Notify the user of success
+
+                    // Update wishListItems in localStorage
+                    let wishListItems = JSON.parse(localStorage.getItem('wishListItems')) || [];
+                    if (!wishListItems.includes(productId)) {
+                        wishListItems.push(productId);
+                        localStorage.setItem('wishListItems', JSON.stringify(wishListItems));
+                    }
+
+                    console.log('Wishlist updated:', wishListItems);
+                } else {
+                    const errorResult = await response.json();
+                    alert(`Failed to add to wishlist: ${errorResult.error}`);
+                }
+            } catch (error) {
+                console.error('Error adding product to wishlist:', error);
+                alert("An error occurred while adding the product to the wishlist.");
+            }
+        }
         // Call the function to fetch and display product details on page load
         document.addEventListener('DOMContentLoaded', fetchProductDetails);
     </script>
