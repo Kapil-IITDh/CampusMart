@@ -28,7 +28,8 @@ function displayProducts(dataset) {
     if (dataset && dataset.products && dataset.products.length > 0) {
         // Loop through each product in the products array
         dataset.products.forEach((product, index) => {
-            const { listingID, title, selling_price, imageURLs } = product;
+            const imageURLs = JSON.parse(product.imageURLs);
+            const { listingID, title, selling_price } = product;
             console.log(`Image URLs:`, imageURLs);
             // Create the URL for the individual product page
             const productPageUrl = `product.html?product_id=${listingID}`;
@@ -48,9 +49,6 @@ function displayProducts(dataset) {
                         <div class="productPrice">₹ ${selling_price}</div>
                         <a href="${productPageUrl}" class="viewProductButton">
                             <button type="button" class="viewProductButton">View Product</button>
-                        </a>
-                        <a href="./message.html">
-                            <button type="button" class="makeAnOfferButton">Make an offer</button>
                         </a>
                         <button type="button" class="deleteButton" data-index="${index}">Delete</button>
                     </div>
@@ -72,22 +70,51 @@ function displayProducts(dataset) {
 }
 
 // Delete handler function
-function handleDelete(event) {
+async function handleDelete(event) {
     const button = event.target;  // The clicked delete button
     const productBlock = button.closest('.productBlock');  // Find the parent product block
     const listingID = productBlock.dataset.listingID;  // Get the listing ID from the data attribute
+    const user = JSON.parse(localStorage.getItem('user'));  // Get user data from localStorage
+
+    if (!user || !user.userID) {
+        alert("User not found. Please log in.");
+        return;
+    }
+
+    const userID = user.userID;
 
     // Find the product in the dataset based on listingID
     const productIndex = wishListItems.products.findIndex(product => product.listingID === parseInt(listingID));
 
     if (productIndex !== -1) {
-        // Remove the product from the dataset
-        wishListItems.products.splice(productIndex, 1);
+        try {
+            // Make a DELETE request to the server with userID included in the body
+            const response = await fetch(`http://127.0.0.1:5000/wishlist/${listingID}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userID })  // Include userID in the request body
+            });
 
-        // Remove the product block from the DOM
-        productBlock.remove();
+            if (response.ok) {
+                // Remove the product from the dataset
+                wishListItems.products.splice(productIndex, 1);
 
-        console.log(`Product with ID ${listingID} deleted.`);
+                // Remove the product block from the DOM
+                productBlock.remove();
+
+                console.log(`Product with ID ${listingID} deleted from the wishlist.`);
+                alert('Product removed from wishlist successfully');
+            } else {
+                const errorResult = await response.json();
+                console.error('Failed to delete product from wishlist:', errorResult);
+                alert('Failed to delete product from wishlist. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the product from the wishlist.');
+        }
     }
 }
 
@@ -123,7 +150,7 @@ async function fetchWishlist(userId) {
 window.onload = function() {
     const user = JSON.parse(localStorage.getItem('user'));  // Ensure the user data is stored during login
     const userId = user ? user.userID : null;
-    alert(userId);
+    // alert(userId);
     if (userId) {
         fetchWishlist(userId);
     } else {

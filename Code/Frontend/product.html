@@ -70,7 +70,7 @@
             if(isLoggedIn){
                 window.location.href ="message.html";
             }else{
-                window.location.href ="SignIn.html";
+                window.location.href =`SignIn.html?seller_id=${window.seller_id}`;
             }
             
             
@@ -105,13 +105,15 @@
                 if (response.ok) {
                     const product = await response.json();
                     console.log('Product details:', product);
-                    alert('responseok');
+                    // alert('responseok');
                     // Populate the main product image
-                    document.getElementById("product-image").src = product.imageURLs[0] =='null'?product.imageURLs[0]:  'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg';
+                    window.seller_id = product.userID;
+                    const imageURLs = JSON.parse(product.imageURLs);
+                    document.getElementById("product-image").src = imageURLs[0] ? imageURLs[0]:  'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg';
                     document.getElementById("product-title").textContent = product.title;
                     document.getElementById("product-price").textContent = `₹ ${product.selling_price}`;
                     document.getElementById("product-description").textContent = product.description;
-                    document.getElementById("seller-name").textContent = `Seller ID: ${product.userID}`; // Replace with actual seller info if available
+                    document.getElementById("seller-name").textContent = `Seller ID: ${product.userID} : ${product.listingID}`; // Replace with actual seller info if available
                     document.getElementById("seller-rating").textContent = "Seller's Rating"; // Replace with real rating data if available
 
                     // Append additional images within the product-image-container
@@ -143,9 +145,11 @@
         // mark as favorite
         async function addToWishlist() {
             const productId = getProductIdFromUrl();
+            // alert(productId);
             const user = JSON.parse(localStorage.getItem('user'));
             const userId = user ? user.userID : null;
-            alert((userId));
+            alert(userId + " , " +productId);
+            // alert((userId));
             if (!userId) {
                 alert("Please log in to add products to your wishlist.");
                 window.location.href ="SignIn.html";
@@ -161,7 +165,7 @@
                     },
                     body: JSON.stringify({
                         "userID": userId,
-                        "listingID": window.productId,
+                        "listingID": productId,
                     })
                 });
 
@@ -170,20 +174,25 @@
                     alert(result.message); // Notify the user of success
 
                     // Update wishListItems in localStorage
-                    let wishListItems = JSON.parse(localStorage.getItem('wishListItems')) || [];
+                
+                let wishListItems = JSON.parse(localStorage.getItem('wishListItems')) || [];
+                // Ensure wishListItems is an array
+                    if (!Array.isArray(wishListItems)) {
+                        wishListItems = [];
+                    }
+
                     if (!wishListItems.includes(productId)) {
                         wishListItems.push(productId);
                         localStorage.setItem('wishListItems', JSON.stringify(wishListItems));
+                        console.log('Wishlist updated:', wishListItems);
+                    } else {
+                        const errorResult = await response.json();
+                        alert(`Failed to add to wishlist: ${errorResult.error}`);
                     }
-
-                    console.log('Wishlist updated:', wishListItems);
-                } else {
-                    const errorResult = await response.json();
-                    alert(`Failed to add to wishlist: ${errorResult.error}`);
-                }
-            } catch (error) {
-                console.error('Error adding product to wishlist:', error);
-                alert("An error occurred while adding the product to the wishlist.");
+                } 
+            }catch (error) {
+                console.error(`Error adding product to wishlist: ${error}`);
+                alert(`error: ${error}`);
             }
         }
         // Call the function to fetch and display product details on page load

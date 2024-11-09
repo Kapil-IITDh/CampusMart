@@ -30,12 +30,13 @@ function displayProducts(dataset) {
   // Check if dataset has products before trying to display
   if (dataset && dataset.products && dataset.products.length > 0) {
       // Loop through each product in the products array
+      
       dataset.products.forEach(product => {
-          const { listingID, title, selling_price, description, imageURLs } = product;
-
+          const { listingID, title, selling_price, description } = product;
+          const imageURLs = JSON.parse(product.imageURLs);
           // Create the URL for the individual product page
           const productPageUrl = `product.html?product_id=${listingID}`;
-
+            // alert(imageURLs[0]);
           // Create product block HTML
           const productBlock = document.createElement('a');
           productBlock.classList.add('productBlock');

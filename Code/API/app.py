@@ -32,18 +32,18 @@ def home_page():
     return jsonify(message="Hello, welcome to CampusMart API!")
 
 # User-related endpoints
-# @app.route("/users", methods=['GET'])
-# def get_all_users():
-#     conn = get_db_connection()
-#     if conn is None:
-#         return jsonify({'error': 'Database connection failed'}), 500
+@app.route("/users", methods=['GET'])
+def get_all_users():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'Database connection failed'}), 500
 
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt FROM Users")
-#     users = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return jsonify(users)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt FROM Users")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users)
 
 @app.route("/users/<int:user_id>", methods=['GET'])
 def get_user(user_id):
@@ -53,8 +53,7 @@ def get_user(user_id):
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt 
-        FROM Users 
+        SELECT userID, name, email, department, userType, phoneNumber, createdAt, updatedAt FROM Users
         WHERE userID = %s
     """, (user_id,))
     
@@ -456,14 +455,14 @@ def add_to_wishlist():
 
     cursor = conn.cursor(dictionary=True)  # Ensure dictionary output
 
-    # Query to check if the listing is active
-    cursor.execute("SELECT isActive FROM Listings WHERE listingID = %s", (data['listingID'],))
-    listing = cursor.fetchone()
+    # # Query to check if the listing is active
+    # cursor.execute("SELECT isActive FROM Listings WHERE listingID = %s", (data['listingID'],))
+    # listing = cursor.fetchone()
 
-    if listing is None or not listing['isActive']:  # This now correctly checks the value
-        cursor.close()
-        conn.close()
-        return jsonify({'error': 'Listing is inactive or does not exist'}), 400  # 400 for bad request
+    # if listing is None or not listing['isActive']:  # This now correctly checks the value
+    #     cursor.close()
+    #     conn.close()
+    #     return jsonify({'error': 'Listing is inactive or does not exist'}), 400  # 400 for bad request
 
     # Insert the listing into the Wishlists table
     cursor.execute("INSERT INTO Wishlists (userID, listingID) VALUES (%s, %s)",
@@ -475,18 +474,41 @@ def add_to_wishlist():
     return jsonify({'message': 'Product added to wishlist successfully'}), 201
 
 
-@app.route('/wishlist/<int:wishlist_id>', methods=['DELETE'])
-def remove_from_wishlist(wishlist_id):
+
+@app.route('/wishlist/<int:listingID>', methods=['DELETE'])
+def remove_from_wishlist(listingID):
+    data = request.get_json()  # Expecting `userID` to be part of the request body
+
+    if not data or 'userID' not in data:
+        return jsonify({'error': 'User ID is required'}), 400
+
+    user_id = data['userID']
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Wishlists WHERE wishlistID = %s", (wishlist_id,))
+    cursor.execute("DELETE FROM Wishlists WHERE listingID = %s AND userID = %s", (listingID, user_id))
     conn.commit()
+
+    # Check if the deletion was successful
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        return jsonify({'error': 'No matching entry found or deletion failed'}), 404
+
     cursor.close()
     conn.close()
     return jsonify({'message': 'Product removed from wishlist successfully'}), 200
+
+
+    # Check if any row was actually deleted
+    if cursor.rowcount == 0:
+        return jsonify({'error': 'Wishlist item not found or does not belong to the user'}), 404
+
+    return jsonify({'message': 'Product removed from wishlist successfully'}), 200
+
 
 
 @app.route('/wishlist/<int:user_id>', methods=['GET'])
