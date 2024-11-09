@@ -183,9 +183,11 @@ def get_products():
     cursor.execute("""
         SELECT 
             l.*, 
+            c.name AS categoryName,
             COALESCE(JSON_ARRAYAGG(li.imgURL), JSON_ARRAY()) AS imageURLs
         FROM Listings l
         LEFT JOIN ListingImages li ON l.listingID = li.listingID
+        LEFT JOIN Categories c ON l.categoryID = c.categoryID
         GROUP BY l.listingID
     """)
     
@@ -197,6 +199,7 @@ def get_products():
         return jsonify({'products': products}), 200
     else:
         return jsonify({'error': 'No products found'}), 404
+
 
 
 @app.route('/products/<int:product_id>', methods=['GET'])
