@@ -39,8 +39,8 @@
             <h2 id="product-title"></h2>
             <p id="product-price" class="price"></p>
             <p id="product-description" class="description"></p>
-            <button class="offer-btn" onclick="makeOffer()" >Make an offer</button>
-            <button class="offer-btn" onclick="addToWishlist()">Add to Wishlist</button>
+            <button class="offer-btn" onclick="makeOffer()" style="background-color: #e6e6fa;" >Make an offer</button>
+            <button class="offer-btn" onclick="addToWishlist()" style="background-color: #ffcccc;">Add to Wishlist</button>
         </div>
     </div>
 
@@ -68,9 +68,9 @@
         function makeOffer(){
             console.log(isLoggedIn);
             if(isLoggedIn){
-                window.location.href =`message.html?seller_id=${window.seller_id}`;
+                window.location.href ="message.html";
             }else{
-                window.location.href ="SignIn.html";
+                window.location.href =`SignIn.html?seller_id=${window.seller_id}`;
             }
             
             
