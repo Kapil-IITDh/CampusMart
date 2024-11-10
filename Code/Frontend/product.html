@@ -68,9 +68,9 @@
         function makeOffer(){
             console.log(isLoggedIn);
             if(isLoggedIn){
-                window.location.href ="message.html";
+                window.location.href =`message.html?seller_id=${window.seller_id}`;
             }else{
-                window.location.href =`SignIn.html?seller_id=${window.seller_id}`;
+                window.location.href ="SignIn.html";
             }
             
             

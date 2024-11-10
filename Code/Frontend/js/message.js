@@ -1,20 +1,37 @@
-const currentUserId = window.userId; // Replace with the logged-in user ID
+const currentUserId =  getUserId(); // Replace with the logged-in user ID
 let selectedUserId = getSellerIdFromUrl() || null; // Get seller ID if passed in URL
 
 // Function to get the seller ID from the URL
 function getSellerIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('seller_id');
+    const sellerId = urlParams.get('seller_id');
+    console.log('Extracted seller_id:', sellerId); // Debugging line
+    return sellerId;
 }
+function getUserId(){
+    // Retrieve the 'user' item from localStorage
+    const user = localStorage.getItem('user');
+    if (user) {
+        const userData = JSON.parse(user);
+        const userID = userData.userID;
+        console.log('User ID:', userID);
+        // alert(userID);
+        return userID;
+    } else {
+        console.log('No user data found in localStorage.');
+    }
 
+}
 // Load the user list and auto-start chat with the seller if applicable
 document.addEventListener('DOMContentLoaded', loadUserList);
 
 // Function to load the user list or display "No chat started yet" if none exist
 async function loadUserList() {
+    // alert("loaduser");
     const userList = document.getElementById('userList');
     userList.innerHTML = ''; // Clear existing user list
-
+    // alert(currentUserId);
+    // alert(selectedUserId);
     try {
         const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}/chats`);
         const users = await response.json();
@@ -149,6 +166,15 @@ async function sendMessage(currentUserId, receiverId) {
         }
     } else {
         alert('Please enter a message before sending.');
+    }
+}
+function startMessagePolling() {
+    if (selectedUserId) {
+        setInterval(() => {
+            fetchAndDisplayMessages(currentUserId, selectedUserId);
+            
+
+        }, 500); // Poll every 5 seconds
     }
 }
 
