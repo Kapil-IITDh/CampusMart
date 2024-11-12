@@ -1,37 +1,39 @@
-const currentUserId =  getUserId(); // Replace with the logged-in user ID
-let selectedUserId = getSellerIdFromUrl() || null; // Get seller ID if passed in URL
+const currentUserId = getUserId();
+let selectedUserId = getSellerIdFromUrl() || null; 
 
 // Function to get the seller ID from the URL
 function getSellerIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     const sellerId = urlParams.get('seller_id');
-    console.log('Extracted seller_id:', sellerId); // Debugging line
+    console.log('Extracted seller_id:', sellerId);
     return sellerId;
 }
+
+// Function to retrieve the logged-in user ID from local storage
 function getUserId(){
-    // Retrieve the 'user' item from localStorage
     const user = localStorage.getItem('user');
     if (user) {
         const userData = JSON.parse(user);
-        const userID = userData.userID;
-        console.log('User ID:', userID);
-        // alert(userID);
-        return userID;
+        console.log('User ID:', userData.userID);
+        return userData.userID;
     } else {
         console.log('No user data found in localStorage.');
     }
-
 }
-// Load the user list and auto-start chat with the seller if applicable
-document.addEventListener('DOMContentLoaded', loadUserList);
+
+// Load the user list and auto-start chat if provided in the URL
+document.addEventListener('DOMContentLoaded', () => {
+    loadUserList();
+    if (selectedUserId) {
+        selectUser(selectedUserId, 'Seller');
+    }
+});
 
 // Function to load the user list or display "No chat started yet" if none exist
 async function loadUserList() {
-    // alert("loaduser");
     const userList = document.getElementById('userList');
-    userList.innerHTML = ''; // Clear existing user list
-    // alert(currentUserId);
-    // alert(selectedUserId);
+    userList.innerHTML = '';
+
     try {
         const response = await fetch(`http://127.0.0.1:5000/users/${currentUserId}/chats`);
         const users = await response.json();
@@ -45,13 +47,11 @@ async function loadUserList() {
                 userList.appendChild(userItem);
             });
 
-            // Auto-start chat with the seller if provided via URL
             if (selectedUserId) {
                 const seller = users.find(user => user.user_id === parseInt(selectedUserId));
                 if (seller) {
                     selectUser(seller.user_id, seller.user_name);
                 } else {
-                    // Add a placeholder seller item to start a chat
                     const sellerItem = document.createElement('li');
                     sellerItem.classList.add('user-item');
                     sellerItem.textContent = 'Seller';
@@ -61,7 +61,15 @@ async function loadUserList() {
                 }
             }
         } else {
-            // Show "No chat started yet" if no chats are found
+            if (selectedUserId) {
+                const sellerItem = document.createElement('li');
+                sellerItem.classList.add('user-item');
+                sellerItem.textContent = 'Seller';
+                sellerItem.onclick = () => selectUser(selectedUserId, 'Seller');
+                userList.appendChild(sellerItem);
+                selectUser(selectedUserId, 'Seller');
+            }
+
             const noChatItem = document.createElement('li');
             noChatItem.textContent = 'No chat started yet';
             noChatItem.classList.add('no-chat');
@@ -77,13 +85,11 @@ function selectUser(userId, userName) {
     selectedUserId = userId;
     document.getElementById('chatHeader').textContent = `Chatting with ${userName}`;
 
-    // Highlight the selected user in the sidebar
     const userItems = document.querySelectorAll('.user-item');
     userItems.forEach(item => item.classList.remove('selected'));
     const selectedItem = Array.from(userItems).find(item => item.textContent === userName);
     if (selectedItem) selectedItem.classList.add('selected');
 
-    // Display messages for the selected user
     displayMessages(userId);
 }
 
@@ -98,10 +104,9 @@ async function fetchAndDisplayMessages(currentUserId, otherUserId, otherUserName
         if (response.ok && messages.length > 0) {
             const messageList = document.getElementById('messageList');
             const chatHeader = document.getElementById('chatHeader');
-            messageList.innerHTML = ''; // Clear the current message list
-            chatHeader.textContent = `Chat with ${otherUserName}`; // Update the header with the selected user
+            messageList.innerHTML = '';
+            chatHeader.textContent = `Chat with ${otherUserName}`;
 
-            // Filter and display messages between the current user and the selected user
             messages.forEach(message => {
                 if ((message.senderID === currentUserId && message.receiverID === otherUserId) ||
                     (message.senderID === otherUserId && message.receiverID === currentUserId)) {
@@ -114,11 +119,9 @@ async function fetchAndDisplayMessages(currentUserId, otherUserId, otherUserName
                 }
             });
 
-            // Scroll to the bottom of the message list
             messageList.scrollTop = messageList.scrollHeight;
         } else {
-            const messageList = document.getElementById('messageList');
-            messageList.innerHTML = '<p>No messages found.</p>'; // Display if no messages are found
+            document.getElementById('messageList').innerHTML = '<p>No messages found.</p>';
         }
     } catch (error) {
         console.error('Error fetching messages:', error);
@@ -156,6 +159,9 @@ async function sendMessage(currentUserId, receiverId) {
 
                 messageList.scrollTop = messageList.scrollHeight;
                 messageInput.value = '';
+
+                // Reload chat list to include the seller if this was the first message
+                loadUserList();
             } else {
                 console.error('Failed to send message:', response.status, response.statusText);
                 alert('Failed to send message. Please try again.');
@@ -168,15 +174,14 @@ async function sendMessage(currentUserId, receiverId) {
         alert('Please enter a message before sending.');
     }
 }
-function startMessagePolling() {
-    if (selectedUserId) {
-        setInterval(() => {
-            fetchAndDisplayMessages(currentUserId, selectedUserId);
-            
 
-        }, 500); // Poll every 5 seconds
+// Polling to refresh the chat list and messages automatically
+setInterval(() => {
+    loadUserList();
+    if (selectedUserId) {
+        fetchAndDisplayMessages(currentUserId, selectedUserId, 'Seller');
     }
-}
+}, 5000);
 
 // Event listener for the "Send" button
 document.getElementById('sendButton').addEventListener('click', () => {
