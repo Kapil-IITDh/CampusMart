@@ -47,7 +47,7 @@ function displayProducts(dataset) {
                     <div class="productDetails">
                         <div class="productTitle">${title}</div>
                         <div class="productPrice">₹ ${selling_price}</div>
-                        <a href="${productPageUrl}" class="viewProductButton">
+                        <a href="${productPageUrl}" >
                             <button type="button" class="viewProductButton">View Product</button>
                         </a>
                         <button type="button" class="deleteButton" data-index="${index}">Delete</button>
