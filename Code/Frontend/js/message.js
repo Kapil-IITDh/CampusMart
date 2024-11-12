@@ -175,6 +175,9 @@ async function sendMessage(currentUserId, receiverId) {
     }
 }
 
+
+
+
 // Polling to refresh the chat list and messages automatically
 setInterval(() => {
     loadUserList();

@@ -1,28 +1,39 @@
-// Simulate user data in localStorage for testing purposes
-if (!localStorage.getItem('user')) {
-    // Simulating user login
-    localStorage.setItem('user', JSON.stringify({ userID: "123" }));
-}
+const userID = getUserId();
 
-const user = JSON.parse(localStorage.getItem('user'));
-if (!user) {
-    alert("Please log in to manage your listings.");
-    window.location.href = "./signin.html";  // Redirect to login page if not logged in
+function getUserId() {
+    const user = localStorage.getItem('user');
+    if (user) {
+        const userData = JSON.parse(user);
+        console.log('User ID:', userData.userID);
+        return userData.userID;
+    } else {
+        console.log('No user data found in localStorage.');
+        return null;
+    }
 }
 
 // Function to fetch and display user listings from the server
 async function displayUserListings() {
-    const userId = user.userID;  // Get user ID from localStorage
+    const user = JSON.parse(localStorage.getItem('user'));  // Retrieve user from localStorage
+    const userID = user ? user.userID : null;
+
+    if (!userID) {
+        alert("User not logged in. Please log in to view your listings.");
+        return;
+    }
+
     const listingsContainer = document.querySelector('.listings-container');
     listingsContainer.innerHTML = '';  // Clear any previous listings
 
     try {
         // Fetch listings from the server
-        const response = await fetch(`http://127.0.0.1:5000/listings/${userId}`);
+        const response = await fetch(`http://127.0.0.1:5000/listings?userID=${userID}`);
         if (!response.ok) {
             throw new Error('Failed to fetch listings');
         }
-        const userListings = await response.json();
+
+        const data = await response.json();
+        const userListings = data.listings;
 
         if (userListings.length === 0) {
             listingsContainer.innerHTML = '<p>No listings found. Please add products to sell.</p>';
@@ -35,15 +46,17 @@ async function displayUserListings() {
             productBlock.classList.add('product-block');
             productBlock.dataset.listingID = listing.listingID;
 
-            // Create the product HTML structure (without description and edit button)
+            // Create the product HTML structure
             productBlock.innerHTML = `
                 <div class="border">
                     <div class="product-image">
-                        <img src="${listing.imageURLs[0] || 'https://via.placeholder.com/150'}" alt="${listing.title}" width="150" height="150">
+                        <img src="${listing.images[0] || 'https://via.placeholder.com/150'}" alt="${listing.title}" width="150" height="150">
                     </div>
                     <div class="product-details">
                         <h3 class="product-title">${listing.title}</h3>
                         <p class="product-price">₹ ${listing.selling_price}</p>
+                        <p class="product-grade">Grade: ${listing.grade}</p>
+                        <p class="product-created">Created on: ${new Date(listing.createdAt).toLocaleDateString()}</p>
                         <button class="delete-btn" data-index="${index}">Delete</button>
                     </div>
                 </div>

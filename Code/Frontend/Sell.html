@@ -21,32 +21,53 @@
 
     <div class="sell-container">
         <h2>Sell</h2>
-        <form action="/sell" method="POST" enctype="multipart/form-data" class="sell-form">
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none; text-align: center; font-size: 16px; color: #555;">
+            Uploading... Please wait.
+        </div>
+    
+        <form id="sellForm" class="sell-form" onsubmit="">
             <div class="form-group">
                 <label for="title">Title:</label>
                 <input type="text" id="title" name="title" placeholder="Product name" required>
             </div>
-
             <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" id="price" name="price" placeholder="Price" required>
+                <label for="price">Selling Price:</label>
+                <input type="number" id="selling_price" name="selling_price" placeholder="Selling price" required step="0.01">
             </div>
-
+            <div class="form-group">
+                <label for="new_item_price">New Item Price (optional):</label>
+                <input type="number" id="new_item_price" name="new_item_price" placeholder="New item price" step="0.01">
+            </div>
             <div class="form-group">
                 <label for="description">Description:</label>
                 <textarea id="description" name="description" placeholder="Description of the product." rows="3" required></textarea>
             </div>
-
             <div class="form-group">
-                <label for="images">Upload images:</label>
-                <input type="file" id="images" name="images" accept="image/*" multiple required>
-                <p class="image-note">Select at least 3</p>
+                <label for="grade">Grade (1-5):</label>
+                <input type="number" id="grade" name="grade" min="1" max="5" placeholder="Condition grade" required>
             </div>
-
-            <button type="submit" class="sell-btn">Sell</button>
+            <div class="form-group">
+                <label for="categoryID">Category:</label>
+                <select id="categoryID" name="categoryID" required>
+                    <option value="1">Electronics</option>
+                    <option value="2">Books</option>
+                    <option value="3">Clothing</option>
+                    <option value="4">Sports</option>
+                    <option value="5">Furniture</option>
+                    <option value="6">Stationery</option>
+                    <option value="7">Gaming</option>
+                    <option value="8">Appliances</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="imageLinks">Image Links:</label>
+                <textarea id="imageLinks" name="imageLinks" placeholder="Enter image URLs, one per line" rows="3" required></textarea>
+                <p class="image-note">Please provide at least 1 image links.</p>
+            </div>
         </form>
+        <button  class="sell-btn" onclick="uploadImages()">Sell</button>
     </div>
-
     <!-- Footer -->
     <footer>
         <div id="Footer"></div>
@@ -56,6 +77,7 @@
     <script src="js/HeaderFooter.js"></script>
     <script src="js/LoginStatus.js"></script>
     <script src="js/products.js"></script>
+    <script src="js/sell.js"></script>
 </body>
 
 </html>
