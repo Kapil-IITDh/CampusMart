@@ -17,7 +17,7 @@ CampusMart is an exclusive online marketplace designed specifically for the IIT 
 - Developed the initial functionality and site map of our website.
 
 ### Week 2
-- **DocumentFile**: [Dataset Link](https://docs.google.com/document/d/1PCM7q97Uw9L0tR_ovDvOgAXHaSmw-3oYz4SrgkymeWM/edit?usp=sharing)
+- **DocumentFile**: [Document Link](https://docs.google.com/document/d/1PCM7q97Uw9L0tR_ovDvOgAXHaSmw-3oYz4SrgkymeWM/edit?usp=sharing)
 - **DataSet**: [Dataset Link](https://drive.google.com/file/d/1FzBnt8e8Xcsx8LhaxInVCdGniCq4-NEg/view?usp=sharing)
 - **Figma Prototype**: [Figma Prototype](https://www.figma.com/design/JO5U9WKFKbSLCHFnlHYoUO/Campus-Mart?node-id=1-4&t=N4Z7jShfCwnsQJbA-1)
 - **API List**: [API Documentation](https://drive.google.com/file/d/1SHfY7bUx9cLKis78apqtt1jLK9NLFhpy/view?usp=drive_link)
