@@ -31,10 +31,32 @@ CampusMart is an exclusive online marketplace designed specifically for the IIT 
 - Updated the GitHub repository.
 - **Database Creation**: Established the database using MySQL Workbench.
 
+### Week 4 & 5
+- Frontend
+  - Dynamic Web Pages.
+  - Routing.
+  - JavaScript functions to connect frontend and backend.
+ 
+- Backend (Updated)
+  - 9 API code.
+  - Database.
+
+- Functionality implemented
+  - Changed Figma’s static web pages to dynamic web pages.
+  - Implemented messaging functionality.
+  - Implemented Sign-up / Login functionality.
+  - Implemented javascript functionality to make the backend communicate with the frontend.
+
+### Week 6
+- Unit Testing
+- Integration Testing
+- Implemented Selling feature
+- Updated Messaging Functionality 
 ## Contributions
 - **Kapil**: Database design and API development
 - **Manish**: Database setup and Figma wireframing
 - **Mridul**: Figma design and prototyping
+
 
 ---
 
