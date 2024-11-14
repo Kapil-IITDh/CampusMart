@@ -23,7 +23,7 @@ def test_register_user(driver):
 
     # Fill in the form fields
     name_field.send_keys("Test User")
-    driver.find_element(By.ID, "email").send_keys("testusr4@iitdh.ac.in")
+    driver.find_element(By.ID, "email").send_keys("testusr6@iitdh.ac.in")
     driver.find_element(By.ID, "password").send_keys("TestPass123")
     driver.find_element(By.ID, "department").send_keys("Engineering")
     driver.find_element(By.ID, "userType").send_keys("Student")

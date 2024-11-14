@@ -35,30 +35,6 @@ def test_fetch_products_success(sample_products):
         assert response.ok
         assert response.json() == sample_products
 
-# def test_display_products(mocker, sample_products):
-    # Mocking the console log
-    # mock_console_log = mocker.patch('builtins.print')
-    
-    # Simulating the displayProducts function
-    # from your_module import displayProducts  # Adjust the import according to your project structure
-    # displayProducts(sample_products)
-
-    # Checking if console log was called correctly
-    # mock_console_log.assert_any_call('Products dataset:', sample_products)
-    # assert mock_console_log.call_count == 1
-
-# def test_display_no_products(mocker):
-#     # Mocking the console log for no products scenario
-#     mock_console_log = mocker.patch('builtins.print')
-
-#     empty_dataset = {
-#         "products": []
-#     }
-#     from your_module import displayProducts  # Adjust the import according to your project structure
-#     displayProducts(empty_dataset)
-
-#     # Verify that the correct message is logged when no products are found
-#     mock_console_log.assert_any_call('No products found in the dataset.')
 
 def test_fetch_products_failure():
     # Mocking the requests.get method to simulate a failure

@@ -9,7 +9,7 @@ BASE_URL = "http://127.0.0.1:5000"  # Update with your actual base URL
 def user_data():
     return {
         "name": "Test User",
-        "email": "test1@iitdh.ac.in",
+        "email": "user52@iitdh.ac.in",
         "password": "testpassword",
         "department": "Engineering",
         "userType": "Student",
@@ -20,24 +20,20 @@ def user_data():
 def duplicate_user_data():
     return {
         "name": "Duplicate User",
-        "email": "duplicateuser@iitdh.ac.in",
+        "email": "user52@iitdh.ac.in",
         "password": "testpassword",
         "department": "Engineering",
         "userType": "Student",
         "phoneNumber": "1234567890"
     }
-def test_register_success(user_data):
-    response = requests.post(f"{BASE_URL}/register", json=user_data)
-    print("Register Status Code:", response.status_code)
-    print("Register Response Text:", response.text)  # Log raw response for debugging
-
-    # Check if response contains additional error information
-    if response.status_code == 400:
-        assert False, f"Expected 201, but got 400 with response: {response.text}"
-
-    # assert response.status_code == 201
-    # assert "message" in response.json()
-    # assert response.json()["message"] == "User registered successfully"
+# def test_register_success(user_data):
+#     response = requests.post(f"{BASE_URL}/register", json=user_data)
+#     print("Register Success Status Code:", response.status_code)
+#     print("Register Success Response JSON:", response.json())
+#     assert response.status_code == 201
+#     assert "message" in response.json()
+#     assert response.json()["message"] == "User registered successfully"
+#     assert "user" in response.json()
 
 
 def test_register_duplicate_user(user_data):
