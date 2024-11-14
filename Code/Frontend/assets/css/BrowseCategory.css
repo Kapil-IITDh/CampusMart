@@ -56,6 +56,12 @@ h1 {
     border-radius: 10px;
     padding: 10px;
     text-align: center;
+    text-decoration: none; /* Remove underline on links */
+    color: #333; /* Set text color to avoid blue links */
+}
+.product-card:hover {
+    transform: scale(1.05); /* Slightly enlarge the card on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
 }
 
 .product-card img {
@@ -72,4 +78,8 @@ h1 {
 
 .product-name {
     margin: 10px 0;
+}
+.product-card a {
+    color: inherit; /* Inherit color to avoid blue links */
+    text-decoration: none;
 }

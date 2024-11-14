@@ -57,11 +57,11 @@ async function registerUser() {
             window.location.href = "./index.html";
         } else {
             const errorResult = await response.json();
-            alert(`Registration failed: ${errorResult.error}`);
+            // alert(`Registration failed: ${errorResult.error}`);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert("An error occurred during registration. Please try again.");
+        // alert("An error occurred during registration. Please try again.");
     }
 }
 
@@ -73,5 +73,5 @@ function getUserId() {
 }
 
 function hola() {
-    alert("new");
+    // alert("new");
 }

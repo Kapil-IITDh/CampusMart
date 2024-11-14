@@ -129,12 +129,20 @@ def register():
     if conn is None:
         return jsonify({'error': 'Database connection failed'}), 500
 
+    # Check if user already exists
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Users WHERE email = %s", (data['email'],))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        cursor.close()
+        conn.close()
+        return jsonify({'error': 'User already exists'}), 400
+
     # Validate that userType is one of the ENUM values
     if data['userType'] not in ['Student', 'Faculty', 'Staff']:
         return jsonify({'error': 'Invalid userType. Must be "Student", "Faculty", or "Staff".'}), 400
 
     try:
-        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             INSERT INTO Users (name, email, department, passwordHash, userType, phoneNumber)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -163,7 +171,6 @@ def register():
         cursor.close()
         conn.close()
         return jsonify({'error': str(e)}), 400
-
 
 
 from flask import request, jsonify
@@ -327,8 +334,8 @@ def delete_product(product_id):
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Listings WHERE listingID = %s", (product_id,))
     cursor.execute("DELETE FROM ListingImages WHERE listingID = %s", (product_id,))
+    cursor.execute("DELETE FROM Listings WHERE listingID = %s", (product_id,))
     conn.commit()
     cursor.close()
     conn.close()

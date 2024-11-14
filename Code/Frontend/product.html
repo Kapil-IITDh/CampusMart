@@ -39,8 +39,8 @@
             <h2 id="product-title"></h2>
             <p id="product-price" class="price"></p>
             <p id="product-description" class="description"></p>
-            <button class="offer-btn" onclick="makeOffer()" style="background-color: #e6e6fa;" >Make an offer</button>
-            <button class="offer-btn" onclick="addToWishlist()" style="background-color: #ffcccc;">Add to Wishlist</button>
+            <button id="makeOfferButton" class="offer-btn" onclick="makeOffer()" style="background-color: #e6e6fa;" >Make an offer</button>
+            <button id="addToWishlistButton" class="offer-btn" onclick="addToWishlist()" style="background-color: #ffcccc;">Add to Wishlist</button>
         </div>
     </div>
 
@@ -148,7 +148,7 @@
             // alert(productId);
             const user = JSON.parse(localStorage.getItem('user'));
             const userId = user ? user.userID : null;
-            alert(userId + " , " +productId);
+            // alert(userId + " , " +productId);
             // alert((userId));
             if (!userId) {
                 alert("Please log in to add products to your wishlist.");

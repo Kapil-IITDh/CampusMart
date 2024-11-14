@@ -38,7 +38,7 @@ async function signIn() {
             console.log('User data stored in localStorage:', result.user);
             
             window.userID = result.user.userID;
-            alert(window.userID);
+            // alert(window.userID);
             // Redirect to the homepage or another page
             window.location.href = "./index.html";
         } else {

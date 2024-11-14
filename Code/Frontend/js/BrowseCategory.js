@@ -23,12 +23,15 @@ async function fetchProducts() {
 function createProductCard(product) {
     const imageUrl = JSON.parse(product.imageURLs)[0] || 'https://via.placeholder.com/150'; // Parse imageURLs and use the first image
     return `
-        <div class="product-card">
-            <img src="${imageUrl}" alt="${product.title}">
-            <div class="product-name">${product.title}</div>
-            <div class="product-price">Price: ₹${product.selling_price}</div>
-            <div class="product-description">${product.description}</div>
-        </div>
+   <a href="http://127.0.0.1:5502/Code/Frontend/product.html?product_id=${product.listingID}" 
+   style="text-decoration: none; color: inherit;">
+    <div class="product-card">
+        <img src="${imageUrl}" alt="${product.title}">
+        <div class="product-name">${product.title}</div>
+        <div class="product-price">Price: ₹${product.selling_price}</div>
+        <div class="product-description">${product.description}</div>
+    </div>
+</a>
     `;
 }
 
